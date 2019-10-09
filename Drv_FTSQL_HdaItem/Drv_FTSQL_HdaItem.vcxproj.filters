@@ -19,6 +19,12 @@
     <Filter Include="Source Files\Configurator">
       <UniqueIdentifier>{653447c3-d5c5-4b13-8ab4-e9f9f49a6dbe}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Plugin">
+      <UniqueIdentifier>{b4d7a8e8-06c9-46bf-83c5-2535bcfd643d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Plugin">
+      <UniqueIdentifier>{ce59891d-5659-46fa-90e4-a61a8b25777f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -36,6 +42,15 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Export.h">
+      <Filter>Header Files\Plugin</Filter>
+    </ClInclude>
+    <ClInclude Include="PluginObjectFactory.h">
+      <Filter>Header Files\Plugin</Filter>
+    </ClInclude>
+    <ClInclude Include="DSource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -49,6 +64,15 @@
     </ClCompile>
     <ClCompile Include="DlgConnectionSqlSvr.cpp">
       <Filter>Source Files\Configurator</Filter>
+    </ClCompile>
+    <ClCompile Include="Export.cpp">
+      <Filter>Source Files\Plugin</Filter>
+    </ClCompile>
+    <ClCompile Include="PluginObjectFactory.cpp">
+      <Filter>Source Files\Plugin</Filter>
+    </ClCompile>
+    <ClCompile Include="DSource.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
