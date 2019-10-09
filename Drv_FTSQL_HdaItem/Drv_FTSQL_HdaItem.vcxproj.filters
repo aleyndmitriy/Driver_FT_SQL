@@ -30,6 +30,12 @@
     <ClInclude Include="DsConfigurator.h">
       <Filter>Header Files\Configurator</Filter>
     </ClInclude>
+    <ClInclude Include="DlgConnectionSqlSvr.h">
+      <Filter>Header Files\Configurator</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -41,5 +47,13 @@
     <ClCompile Include="CDsConfigurator.cpp">
       <Filter>Source Files\Configurator</Filter>
     </ClCompile>
+    <ClCompile Include="DlgConnectionSqlSvr.cpp">
+      <Filter>Source Files\Configurator</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Drv_FTSQL_HdaItem.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>
