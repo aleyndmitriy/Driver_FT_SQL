@@ -3,7 +3,7 @@
 #include<OdsErr.h>
 #include<string>
 #include<map>
-#include<memory>
+#include"CRegisterInfo.h"
 namespace DrvFTSQLHdaItem
 {
 	class PluginObjectFactory : public ODS::IPluginObjectFactory
@@ -18,9 +18,10 @@ namespace DrvFTSQLHdaItem
 		void* GetInterface(int nIfcId) override;
 		int CreateObject(const TCHAR* szObjKey, void* pObjCreationParam, ODS::IPluginObj** ppPluginObj) override;
 		int DestroyObject(ODS::IPluginObj* pPluginObj) override;
-		bool InsertRegisterInfo(std::string name, std::unique_ptr<ODS::RegisterInfo>&& reg);
+		std::string CreateRegisterInfo();
+		ODS::RegisterInfo* GetRegisterInfo(const std::string& objKey);
 	private:
 		PluginObjectFactory() = default;
-		std::map<std::string, std::unique_ptr<ODS::RegisterInfo> > regInfoDSList;
+		std::map<std::string, CRegisterInfo> regInfoDSList;
 	};
 }

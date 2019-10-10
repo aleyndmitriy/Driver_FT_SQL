@@ -19,7 +19,8 @@ int DrvFTSQLHdaItem::PluginObjectFactory::CreateObject(const TCHAR* szObjKey, vo
 
 	if (!strcmp(szObjKey, PluginObjKey::HDA_ITEM_CITECT_VJH))
 	{
-		*ppPluginObj = new CDSource;
+		std::string key(szObjKey);
+		*ppPluginObj = new CDSource(key);
 		if (*ppPluginObj)
 			return ODS::ERR::OK;
 		else
@@ -34,4 +35,14 @@ int DrvFTSQLHdaItem::PluginObjectFactory::DestroyObject(ODS::IPluginObj* pPlugin
 	delete pPluginObj;
 
 	return ODS::ERR::OK;
+}
+
+std::string DrvFTSQLHdaItem::PluginObjectFactory::CreateRegisterInfo()
+{
+
+}
+
+ODS::RegisterInfo* DrvFTSQLHdaItem::PluginObjectFactory::GetRegisterInfo(const std::string& objKey)
+{
+
 }
