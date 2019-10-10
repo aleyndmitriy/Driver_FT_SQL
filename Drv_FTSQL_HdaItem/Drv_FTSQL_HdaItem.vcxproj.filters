@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Исходные файлы">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Файлы заголовков">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Файлы ресурсов">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Файлы заголовков\Configurator">
+      <UniqueIdentifier>{e86f5778-dcfc-4a8d-a993-33bd3f43038e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Configurator">
+      <UniqueIdentifier>{f00b701d-71e2-4e7a-838a-3776512df65e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Plugin">
+      <UniqueIdentifier>{2d8d8c41-4147-4978-b423-dcad13fb40e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Plugin">
+      <UniqueIdentifier>{86e1ce56-f64b-4ebc-b973-804715a4cab4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Drv_FTSQL_HdaItem.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="DsConfigurator.cpp">
+      <Filter>Исходные файлы\Configurator</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgConnectionSqlSvr.cpp">
+      <Filter>Исходные файлы\Configurator</Filter>
+    </ClCompile>
+    <ClCompile Include="DSource.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="PluginObjectFactory.cpp">
+      <Filter>Исходные файлы\Plugin</Filter>
+    </ClCompile>
+    <ClCompile Include="PropertySet.cpp">
+      <Filter>Исходные файлы\Plugin</Filter>
+    </ClCompile>
+    <ClCompile Include="RegisterInfo.cpp">
+      <Filter>Исходные файлы\Plugin</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Drv_FTSQL_HdaItem.def">
+      <Filter>Исходные файлы</Filter>
+    </None>
+    <None Include="res\Drv_FTSQL_HdaItem.rc2">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="framework.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Drv_FTSQL_HdaItem.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="DsConfigurator.h">
+      <Filter>Файлы заголовков\Configurator</Filter>
+    </ClInclude>
+    <ClInclude Include="DlgConnectionSqlSvr.h">
+      <Filter>Файлы заголовков\Configurator</Filter>
+    </ClInclude>
+    <ClInclude Include="Constants.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="DSource.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="PluginObjectFactory.h">
+      <Filter>Файлы заголовков\Plugin</Filter>
+    </ClInclude>
+    <ClInclude Include="PropertySet.h">
+      <Filter>Файлы заголовков\Plugin</Filter>
+    </ClInclude>
+    <ClInclude Include="RegisterInfo.h">
+      <Filter>Файлы заголовков\Plugin</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Drv_FTSQL_HdaItem.rc">
+      <Filter>Файлы ресурсов</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

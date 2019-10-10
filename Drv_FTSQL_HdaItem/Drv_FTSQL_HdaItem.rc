@@ -1,0 +1,213 @@
+// Microsoft Visual C++ generated resource script.
+//
+#pragma code_page(65001)
+
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#ifndef APSTUDIO_INVOKED
+#include "targetver.h"
+#endif
+#include "afxres.h"
+#include "verrsrc.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Русский (Россия) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_RUS)
+LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041904B0"
+        BEGIN
+            VALUE "CompanyName", "TODO: <название компании>"
+            VALUE "FileDescription", "TODO: <описание файла>"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "Drv_FTSQL_HdaItem.dll"
+            VALUE "LegalCopyright", "TODO: (c) <название компании>.  Все права защищены."
+            VALUE "OriginalFilename", "Drv_FTSQL_HdaItem.dll"
+            VALUE "ProductName", "TODO: <Название продукта>"
+            VALUE "ProductVersion", "1.0.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x419, 1200
+    END
+END
+
+#endif    // Русский (Россия) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Английский (США) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#ifndef APSTUDIO_INVOKED\r\n"
+    "#include ""targetver.h""\r\n"
+    "#endif\r\n"
+    "#include ""afxres.h""\r\n"
+    "#include ""verrsrc.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_RUS)\r\n"
+    "LANGUAGE 25, 1\r\n"
+    "#include ""res\\Drv_FTSQL_HdaItem.rc2""  // Ãƒâ€˜Ã¢â€šÂ¬ÃƒÂÃ‚ÂµÃƒâ€˜Ã‚ÂÃƒâ€˜Ã†â€™Ãƒâ€˜Ã¢â€šÂ¬Ãƒâ€˜Ã‚ÂÃƒâ€˜Ã¢â‚¬Â¹, ÃƒÂÃ‚Â½ÃƒÂÃ‚Âµ Ãƒâ€˜Ã¢â€šÂ¬ÃƒÂÃ‚ÂµÃƒÂÃ‚Â´ÃƒÂÃ‚Â°ÃƒÂÃ‚ÂºÃƒâ€˜Ã¢â‚¬Å¡ÃƒÂÃ‚Â¸Ãƒâ€˜Ã¢â€šÂ¬Ãƒâ€˜Ã†â€™ÃƒÂÃ‚ÂµÃƒÂÃ‚Â¼Ãƒâ€˜Ã¢â‚¬Â¹ÃƒÂÃ‚Âµ ÃƒÂÃ‚Â² Microsoft Visual C++\r\n"
+    "#include ""l.RUS\\afxres.rc""      // ÃƒÂÃ‚Â¡Ãƒâ€˜Ã¢â‚¬Å¡ÃƒÂÃ‚Â°ÃƒÂÃ‚Â½ÃƒÂÃ‚Â´ÃƒÂÃ‚Â°Ãƒâ€˜Ã¢â€šÂ¬Ãƒâ€˜Ã¢â‚¬Å¡ÃƒÂÃ‚Â½Ãƒâ€˜Ã¢â‚¬Â¹ÃƒÂÃ‚Âµ ÃƒÂÃ‚ÂºÃƒÂÃ‚Â¾ÃƒÂÃ‚Â¼ÃƒÂÃ‚Â¿ÃƒÂÃ‚Â¾ÃƒÂÃ‚Â½ÃƒÂÃ‚ÂµÃƒÂÃ‚Â½Ãƒâ€˜Ã¢â‚¬Å¡Ãƒâ€˜Ã¢â‚¬Â¹\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_CONNECTION_SQL_SVR DIALOGEX 0, 0, 352, 264
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_SYSMENU
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "ОК",IDOK,19,235,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,85,235,50,14
+    GROUPBOX        "Connection to Database",IDC_GR_CONNECT,7,7,338,170
+    COMBOBOX        IDC_COMBO_SERVER_NAME,131,21,200,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Server Name:",IDC_STATIC_SERVER,31,21,51,8
+    LTEXT           "Authentication:",IDC_STATIC_AUTH,31,45,51,8
+    COMBOBOX        IDC_COMBO_AUTH_TYPE,131,45,200,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "User name:",IDC_STATIC_USER,50,71,38,8
+    EDITTEXT        IDC_EDIT_USERNAME,131,70,200,12,ES_AUTOHSCROLL
+    LTEXT           "Password:",IDC_STATIC_PASSWORD,51,96,34,8
+    EDITTEXT        IDC_EDIT_PASSWORD,130,97,201,14,ES_PASSWORD | ES_AUTOHSCROLL
+    PUSHBUTTON      "Test Connection",IDC_BUTTON_TESTCONNECTION,253,122,77,18
+    LTEXT           "Database:",IDC_STATIC_DATABASE,48,145,34,8
+    COMBOBOX        IDC_COMBO_DATABASE,131,148,196,30,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Data Quality:",IDC_STATIC_QUALITY,39,185,44,8
+    EDITTEXT        IDC_EDIT_DATA_QUALITY,94,183,151,14,ES_AUTOHSCROLL
+    LTEXT           "Days back for previous value:",IDC_STATIC_DAYS_BACK,41,205,96,8
+    EDITTEXT        IDC_EDIT_DAYS_BACK,150,204,94,14,ES_AUTOHSCROLL
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_CONNECTION_SQL_SVR, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 345
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 257
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_CONNECTION_SQL_SVR AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_CONNECTION_SQL_SVR DLGINIT
+BEGIN
+    IDC_COMBO_AUTH_TYPE, 0x403, 23, 0
+0x6957, 0x646e, 0x776f, 0x2073, 0x7541, 0x6874, 0x6e65, 0x6974, 0x6163, 
+0x6974, 0x6e6f, "\000" 
+    IDC_COMBO_AUTH_TYPE, 0x403, 26, 0
+0x5153, 0x204c, 0x6553, 0x7672, 0x7265, 0x4120, 0x7475, 0x6568, 0x746e, 
+0x6369, 0x7461, 0x6f69, 0x006e, 
+    0
+END
+
+#endif    // Английский (США) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_RUS)
+LANGUAGE 25, 1
+#include "res\Drv_FTSQL_HdaItem.rc2"  // Ã‘â‚¬ÃÂµÃ‘ÂÃ‘Æ’Ã‘â‚¬Ã‘ÂÃ‘â€¹, ÃÂ½ÃÂµ Ã‘â‚¬ÃÂµÃÂ´ÃÂ°ÃÂºÃ‘â€šÃÂ¸Ã‘â‚¬Ã‘Æ’ÃÂµÃÂ¼Ã‘â€¹ÃÂµ ÃÂ² Microsoft Visual C++
+#include "l.RUS\afxres.rc"      // ÃÂ¡Ã‘â€šÃÂ°ÃÂ½ÃÂ´ÃÂ°Ã‘â‚¬Ã‘â€šÃÂ½Ã‘â€¹ÃÂµ ÃÂºÃÂ¾ÃÂ¼ÃÂ¿ÃÂ¾ÃÂ½ÃÂµÃÂ½Ã‘â€šÃ‘â€¹
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
