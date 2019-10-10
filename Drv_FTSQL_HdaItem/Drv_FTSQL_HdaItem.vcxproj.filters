@@ -51,6 +51,12 @@
     <ClInclude Include="DSource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PropertySet.h">
+      <Filter>Header Files\Plugin</Filter>
+    </ClInclude>
+    <ClInclude Include="CRegisterInfo.h">
+      <Filter>Header Files\Plugin</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -73,6 +79,9 @@
     </ClCompile>
     <ClCompile Include="DSource.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PropertySet.cpp">
+      <Filter>Source Files\Plugin</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
