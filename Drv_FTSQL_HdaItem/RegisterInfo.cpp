@@ -1,6 +1,7 @@
 #include "pch.h"
 #include"RegisterInfo.h"
 #include "Constants.h"
+#include<IDataSource.h>
 
 DrvFTSQLHdaItem::CRegisterInfo::CRegisterInfo():CRegisterInfo(VERSION_MINOR, VERSION_MAJOR, nullptr,nullptr,nullptr)
 {
@@ -19,7 +20,19 @@ DrvFTSQLHdaItem::CRegisterInfo::CRegisterInfo(int minorVersion, int majorVersion
 	}
 	m_RegInfo.m_pObjCreationParam = param;
 	m_RegInfo.m_pFactory = factory;
-	m_RegInfo.m_pPropertySet = new CPropertySet();
+	CPropertySet* propSet = new CPropertySet();
+	propSet->AddProperty(ODS::IDataSource::PROPERTY_ID_VENDOR, TEXT("PROPERTY_ID_VENDOR"), FTSQL_VENDOR);
+	propSet->AddProperty(ODS::IDataSource::PROPERTY_ID_DATA_SOURCE, TEXT("PROPERTY_ID_DATA_SOURCE"), FTSQL_HDA_ITEM_DRIVER);
+	propSet->AddProperty(ODS::IDataSource::PROPERTY_ID_CLIENT_NAME, TEXT("PROPERTY_ID_CLIENT_NAME"), FTSQL_HDA_ITEM_CLIENT_NAME);
+	propSet->AddProperty(ODS::IDataSource::PROPERTY_ID_DESCRIPTION, TEXT("PROPERTY_ID_DESCRIPTION"), FTSQL_HDA_ITEM_DESC);
+	VARIANT vVal;
+	::VariantInit(&vVal);
+	vVal.boolVal = VARIANT_TRUE;
+	vVal.vt = VT_BOOL;
+	propSet->AddProperty(ODS::IDataSource::PROPERTY_ID_HAS_CONFIGURATION_UI, _T("PROPERTY_ID_HAS_CONFIGURATION_UI"),
+		&vVal);
+	::VariantClear(&vVal);
+	m_RegInfo.m_pPropertySet = propSet;
 }
 
 DrvFTSQLHdaItem::CRegisterInfo::~CRegisterInfo()

@@ -25,6 +25,18 @@
     <Filter Include="Исходные файлы\Plugin">
       <UniqueIdentifier>{86e1ce56-f64b-4ebc-b973-804715a4cab4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Исходные файлы\Browser">
+      <UniqueIdentifier>{02f86d69-49bd-49af-9cd5-e6df2f8aaa3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Browser">
+      <UniqueIdentifier>{8ed6439e-ad2d-4980-910b-4d5bdacef867}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Server">
+      <UniqueIdentifier>{30ff1725-8ff9-47f4-a378-159046bacd13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Server">
+      <UniqueIdentifier>{847b2ce1-1521-4ed4-ad12-b87659fda906}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Drv_FTSQL_HdaItem.cpp">
@@ -49,6 +61,15 @@
       <Filter>Исходные файлы\Plugin</Filter>
     </ClCompile>
     <ClCompile Include="RegisterInfo.cpp">
+      <Filter>Исходные файлы\Plugin</Filter>
+    </ClCompile>
+    <ClCompile Include="BrowserHdaItem.cpp">
+      <Filter>Исходные файлы\Browser</Filter>
+    </ClCompile>
+    <ClCompile Include="ServerHdaItem.cpp">
+      <Filter>Исходные файлы\Server</Filter>
+    </ClCompile>
+    <ClCompile Include="Export.cpp">
       <Filter>Исходные файлы\Plugin</Filter>
     </ClCompile>
   </ItemGroup>
@@ -95,6 +116,15 @@
       <Filter>Файлы заголовков\Plugin</Filter>
     </ClInclude>
     <ClInclude Include="RegisterInfo.h">
+      <Filter>Файлы заголовков\Plugin</Filter>
+    </ClInclude>
+    <ClInclude Include="BrowserHdaItem.h">
+      <Filter>Файлы заголовков\Browser</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerHdaItem.h">
+      <Filter>Файлы заголовков\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="Export.h">
       <Filter>Файлы заголовков\Plugin</Filter>
     </ClInclude>
   </ItemGroup>

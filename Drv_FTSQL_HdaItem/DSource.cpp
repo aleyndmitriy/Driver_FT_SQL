@@ -2,11 +2,11 @@
 #include "DSource.h"
 #include "PluginObjectFactory.h"
 
-DrvFTSQLHdaItem::CDSource::CDSource() : m_pConfigurator([this]()->ODS::UI::IAbstractUIFacrory* {
+DrvFTSQLHdaItem::CDSource::CDSource() : m_Configurator([this]()->ODS::UI::IAbstractUIFacrory* {
 	if (m_pHost)
 		return (ODS::UI::IAbstractUIFacrory*) (m_pHost->GetInterface(ODS::IPluginHost::IID_UI_FACTORY));
 	return 	nullptr;
-	}), m_pHost(nullptr)
+	}), m_Browser(), m_Server(),m_pHost(nullptr)
 {
 
 }
@@ -23,17 +23,17 @@ DrvFTSQLHdaItem::CDSource::CDSource() : m_pConfigurator([this]()->ODS::UI::IAbst
 
 	ODS::IDsConfigurator* DrvFTSQLHdaItem::CDSource::GetConfigurator()
 	{
-		return &m_pConfigurator;
+		return &m_Configurator;
 	}
 
 	ODS::IServerHda* DrvFTSQLHdaItem::CDSource::GetServer()
 	{
-		return NULL;
+		return &m_Server;
 	}
 
 	ODS::IBrowserItem* DrvFTSQLHdaItem::CDSource::GetBrowser()
 	{
-		return NULL;
+		return &m_Browser;
 	}
 
 	int DrvFTSQLHdaItem::CDSource::Attach(const ODS::IPluginHost* pHost)

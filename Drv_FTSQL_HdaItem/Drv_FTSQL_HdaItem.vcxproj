@@ -191,10 +191,12 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BrowserHdaItem.cpp" />
     <ClCompile Include="DlgConnectionSqlSvr.cpp" />
     <ClCompile Include="Drv_FTSQL_HdaItem.cpp" />
     <ClCompile Include="DsConfigurator.cpp" />
     <ClCompile Include="DSource.cpp" />
+    <ClCompile Include="Export.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -204,23 +206,27 @@
     <ClCompile Include="PluginObjectFactory.cpp" />
     <ClCompile Include="PropertySet.cpp" />
     <ClCompile Include="RegisterInfo.cpp" />
+    <ClCompile Include="ServerHdaItem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Drv_FTSQL_HdaItem.def" />
     <None Include="res\Drv_FTSQL_HdaItem.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BrowserHdaItem.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="DlgConnectionSqlSvr.h" />
     <ClInclude Include="Drv_FTSQL_HdaItem.h" />
     <ClInclude Include="DsConfigurator.h" />
     <ClInclude Include="DSource.h" />
+    <ClInclude Include="Export.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PluginObjectFactory.h" />
     <ClInclude Include="PropertySet.h" />
     <ClInclude Include="RegisterInfo.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="ServerHdaItem.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>

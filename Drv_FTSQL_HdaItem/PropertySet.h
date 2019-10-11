@@ -13,7 +13,7 @@ namespace DrvFTSQLHdaItem
 		CPropertySet(CPropertySet&& src) noexcept = default;
 		CPropertySet& operator=(const CPropertySet& src) = default;
 		CPropertySet& operator=(CPropertySet&& src) = default;
-		~CPropertySet();
+		virtual ~CPropertySet();
 		void GetPropertyInfoList(ODS::PropertyInfo** ppPropInfoList, ULONG* pulCount) const override;
 		void DestroyPropertyInfoList(ODS::PropertyInfo* pPropInfoList, ULONG ulCount) const override;
 		void GetPropertyList(ODS::Property** ppPropList, ULONG* pulCount) const override;

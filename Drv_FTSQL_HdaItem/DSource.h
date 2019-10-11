@@ -2,6 +2,8 @@
 #include <ISourceHdaItem.h>
 #include<IPluginHost.h>
 #include "DsConfigurator.h"
+#include "BrowserHdaItem.h"
+#include "ServerHdaItem.h"
 
 namespace DrvFTSQLHdaItem
 {
@@ -22,7 +24,9 @@ namespace DrvFTSQLHdaItem
 		int Detach() override;
 		ODS::IPropertySet* GetPropertySet() override;
 	private:
-		CDsConfigurator m_pConfigurator;
+		CDsConfigurator m_Configurator;
+		BrowserHdaItem m_Browser;
+		ServerHdaItem m_Server;
 		ODS::IPluginHost* m_pHost;
 	};
 }
