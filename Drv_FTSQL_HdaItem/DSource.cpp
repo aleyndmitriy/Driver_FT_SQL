@@ -2,7 +2,7 @@
 #include "DSource.h"
 #include "PluginObjectFactory.h"
 
-DrvFTSQLHdaItem::CDSource::CDSource(const std::string& key) : objKey(key), m_pConfigurator([this]()->ODS::UI::IAbstractUIFacrory* {
+DrvFTSQLHdaItem::CDSource::CDSource() : m_pConfigurator([this]()->ODS::UI::IAbstractUIFacrory* {
 	if (m_pHost)
 		return (ODS::UI::IAbstractUIFacrory*) (m_pHost->GetInterface(ODS::IPluginHost::IID_UI_FACTORY));
 	return 	nullptr;
@@ -53,6 +53,6 @@ DrvFTSQLHdaItem::CDSource::CDSource(const std::string& key) : objKey(key), m_pCo
 
 	ODS::IPropertySet* DrvFTSQLHdaItem::CDSource::GetPropertySet()
 	{
-		ODS::RegisterInfo* pInfo = PluginObjectFactory::GetInstance().GetRegisterInfo(objKey);
+		ODS::RegisterInfo* pInfo = PluginObjectFactory::GetInstance().GetRegisterInfo();
 		return pInfo->m_pPropertySet;
 	}

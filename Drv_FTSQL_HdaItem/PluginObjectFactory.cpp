@@ -2,6 +2,7 @@
 #include "PluginObjectFactory.h"
 #include <OdsErr.h>
 #include "DSource.h"
+#include"Constants.h"
 
 DrvFTSQLHdaItem::PluginObjectFactory& DrvFTSQLHdaItem::PluginObjectFactory::GetInstance()
 {
@@ -17,13 +18,14 @@ void* DrvFTSQLHdaItem::PluginObjectFactory::GetInterface(int nIfcId)
 int DrvFTSQLHdaItem::PluginObjectFactory::CreateObject(const TCHAR* szObjKey, void* pObjCreationParam, ODS::IPluginObj** ppPluginObj)
 {
 	*ppPluginObj = 0;
-	std::string key(szObjKey);
-	*ppPluginObj = new CDSource(key);
+	if (_tcscmp(szObjKey, HDA_ITEM_FTSQL_VJH)) {
+		return ODS::ERR::BAD_PARAM;
+	}
+	*ppPluginObj = new CDSource();
 	if (*ppPluginObj)
 		return ODS::ERR::OK;
 	else
 		return ODS::ERR::MEMORY_ALLOCATION_ERR;
-	return ODS::ERR::BAD_PARAM;
 }
 
 int DrvFTSQLHdaItem::PluginObjectFactory::DestroyObject(ODS::IPluginObj* pPluginObj)
@@ -33,12 +35,18 @@ int DrvFTSQLHdaItem::PluginObjectFactory::DestroyObject(ODS::IPluginObj* pPlugin
 	return ODS::ERR::OK;
 }
 
-std::string DrvFTSQLHdaItem::PluginObjectFactory::CreateRegisterInfo()
+void DrvFTSQLHdaItem::PluginObjectFactory::CreateRegisterInfo()
 {
-	return std::string();
+	regInfoDSList = std::make_unique<CRegisterInfo>(VERSION_MINOR, VERSION_MAJOR, HDA_ITEM_FTSQL_VJH, nullptr, this);
 }
 
-ODS::RegisterInfo* DrvFTSQLHdaItem::PluginObjectFactory::GetRegisterInfo(const std::string& objKey)
+ODS::RegisterInfo* DrvFTSQLHdaItem::PluginObjectFactory::GetRegisterInfo()
 {
-	return NULL;
+	if (regInfoDSList) {
+		return &(regInfoDSList->m_RegInfo);
+	}
+	else {
+		return nullptr;
+	}
+	
 }

@@ -8,7 +8,7 @@ namespace DrvFTSQLHdaItem
 	class CDSource : public ODS::ISourceHdaItem
 	{
 	public:
-		CDSource(const std::string& key);
+		CDSource();
 		~CDSource();
 		CDSource(const CDSource& src) = delete;
 		CDSource& operator=(const CDSource& src) = delete;
@@ -22,7 +22,6 @@ namespace DrvFTSQLHdaItem
 		int Detach() override;
 		ODS::IPropertySet* GetPropertySet() override;
 	private:
-		std::string objKey;
 		CDsConfigurator m_pConfigurator;
 		ODS::IPluginHost* m_pHost;
 	};

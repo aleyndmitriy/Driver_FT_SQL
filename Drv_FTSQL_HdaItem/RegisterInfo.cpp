@@ -2,13 +2,23 @@
 #include"RegisterInfo.h"
 #include "Constants.h"
 
-DrvFTSQLHdaItem::CRegisterInfo::CRegisterInfo()
+DrvFTSQLHdaItem::CRegisterInfo::CRegisterInfo():CRegisterInfo(VERSION_MINOR, VERSION_MAJOR, nullptr,nullptr,nullptr)
 {
-	m_RegInfo.m_Version.m_nMajor = VERSION_MAJOR;
-	m_RegInfo.m_Version.m_nMinor = VERSION_MINOR;
-	memset(m_RegInfo.m_szObjKey, '\0', MAX_PATH);
-	m_RegInfo.m_pObjCreationParam = nullptr;
-	m_RegInfo.m_pFactory = nullptr;
+	
+}
+
+DrvFTSQLHdaItem::CRegisterInfo::CRegisterInfo(int minorVersion, int majorVersion, const TCHAR* key, void* param, ODS::IPluginObjectFactory* factory)
+{
+	m_RegInfo.m_Version.m_nMinor = minorVersion;
+	m_RegInfo.m_Version.m_nMajor = majorVersion;
+	if (key != nullptr) {
+		_tcscpy_s(m_RegInfo.m_szObjKey, MAX_PATH, key);
+	}
+	else {
+		memset(m_RegInfo.m_szObjKey, '\0', MAX_PATH);
+	}
+	m_RegInfo.m_pObjCreationParam = param;
+	m_RegInfo.m_pFactory = factory;
 	m_RegInfo.m_pPropertySet = new CPropertySet();
 }
 
@@ -20,15 +30,5 @@ DrvFTSQLHdaItem::CRegisterInfo::~CRegisterInfo()
 	m_RegInfo.m_pObjCreationParam = nullptr;
 	m_RegInfo.m_pFactory = nullptr;
 	delete m_RegInfo.m_pPropertySet;
-}
-
-DrvFTSQLHdaItem::CRegisterInfo::CRegisterInfo(const CRegisterInfo& src)
-{
-	m_RegInfo.m_Version.m_nMajor = src.m_RegInfo.m_Version.m_nMajor;
-	m_RegInfo.m_Version.m_nMinor = src.m_RegInfo.m_Version.m_nMinor;
-	_tcscpy_s(m_RegInfo.m_szObjKey, MAX_PATH, src.m_RegInfo.m_szObjKey);
-	m_RegInfo.m_pObjCreationParam = src.m_RegInfo.m_pObjCreationParam;
-	m_RegInfo.m_pFactory = src.m_RegInfo.m_pFactory;
-	delete m_RegInfo.m_pPropertySet;
-	m_RegInfo.m_pPropertySet = new CPropertySet();
+	m_RegInfo.m_pPropertySet = nullptr;
 }

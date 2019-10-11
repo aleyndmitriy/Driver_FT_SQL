@@ -1,9 +1,9 @@
 #pragma once
 #include<IPluginObjectFactory.h>
 #include<OdsErr.h>
-#include<string>
-#include<map>
+#include<memory>
 #include"RegisterInfo.h"
+
 namespace DrvFTSQLHdaItem
 {
 	class PluginObjectFactory : public ODS::IPluginObjectFactory
@@ -18,10 +18,10 @@ namespace DrvFTSQLHdaItem
 		void* GetInterface(int nIfcId) override;
 		int CreateObject(const TCHAR* szObjKey, void* pObjCreationParam, ODS::IPluginObj** ppPluginObj) override;
 		int DestroyObject(ODS::IPluginObj* pPluginObj) override;
-		std::string CreateRegisterInfo();
-		ODS::RegisterInfo* GetRegisterInfo(const std::string& objKey);
+		void CreateRegisterInfo();
+		ODS::RegisterInfo* GetRegisterInfo();
 	private:
 		PluginObjectFactory() = default;
-		std::map<std::string, CRegisterInfo> regInfoDSList;
+		std::unique_ptr<CRegisterInfo> regInfoDSList;
 	};
 }
