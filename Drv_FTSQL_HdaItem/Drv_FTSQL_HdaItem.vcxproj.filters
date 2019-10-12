@@ -37,6 +37,21 @@
     <Filter Include="Исходные файлы\Server">
       <UniqueIdentifier>{847b2ce1-1521-4ed4-ad12-b87659fda906}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Файлы заголовков\DataAccessLayer">
+      <UniqueIdentifier>{0ab2643b-4ec9-41c4-9d01-718ac5984482}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\DataAccessLayer">
+      <UniqueIdentifier>{cac2938a-c7fc-46eb-81d9-edc612b65c1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\DataAccessLayer\SettingsDataSource">
+      <UniqueIdentifier>{e75446cc-6155-4521-ab7e-c8b236da7c11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\DataAccessLayer\SettingsDataSource">
+      <UniqueIdentifier>{25e634b8-1df3-44b1-9aa6-404b3fe460ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\pugixml">
+      <UniqueIdentifier>{0de90957-8067-4b91-b47b-5e3ede345955}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Drv_FTSQL_HdaItem.cpp">
@@ -71,6 +86,15 @@
     </ClCompile>
     <ClCompile Include="Export.cpp">
       <Filter>Исходные файлы\Plugin</Filter>
+    </ClCompile>
+    <ClCompile Include="ConnectionAttributes.cpp">
+      <Filter>Исходные файлы\DataAccessLayer</Filter>
+    </ClCompile>
+    <ClCompile Include="XMLSettingsDataSource.cpp">
+      <Filter>Исходные файлы\DataAccessLayer\SettingsDataSource</Filter>
+    </ClCompile>
+    <ClCompile Include="pugixml.cpp">
+      <Filter>Исходные файлы\pugixml</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -126,6 +150,15 @@
     </ClInclude>
     <ClInclude Include="Export.h">
       <Filter>Файлы заголовков\Plugin</Filter>
+    </ClInclude>
+    <ClInclude Include="ConnectionAttributes.h">
+      <Filter>Файлы заголовков\DataAccessLayer</Filter>
+    </ClInclude>
+    <ClInclude Include="ISettingsDataSource.h">
+      <Filter>Файлы заголовков\DataAccessLayer\SettingsDataSource</Filter>
+    </ClInclude>
+    <ClInclude Include="XMLSettingsDataSource.h">
+      <Filter>Файлы заголовков\DataAccessLayer\SettingsDataSource</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
