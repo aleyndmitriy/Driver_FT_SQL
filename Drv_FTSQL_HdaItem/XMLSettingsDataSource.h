@@ -13,6 +13,8 @@ namespace DrvFTSQLHdaItem
 		XMLSettingsDataSource& operator=(XMLSettingsDataSource&& rhs) = delete;
 		bool Save(const ConnectionAttributes& attributes, std::ostream& stream) override;
 		bool Load(ConnectionAttributes& attributes, std::istream& stream) override;
+		bool LoadAttributesString(const char* source, size_t length, ConnectionAttributes& attributes) override;
+		bool SaveAttributesString(const ConnectionAttributes& attributes, std::ostream& stream) override;
 		~XMLSettingsDataSource() {};
 	};
 }

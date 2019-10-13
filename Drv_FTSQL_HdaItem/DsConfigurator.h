@@ -7,7 +7,9 @@ namespace DrvFTSQLHdaItem
 {
 	class CDsConfigurator : public ODS::IDsConfigurator
 	{
+	private:
 		std::function<ODS::UI::IAbstractUIFacrory * (void)>  m_uiFactoryGetter;
+		HWND m_hParentWindow;
 	public:
 
 		CDsConfigurator(std::function<ODS::UI::IAbstractUIFacrory * (void)> uiFactoryGetter);
