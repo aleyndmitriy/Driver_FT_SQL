@@ -2,6 +2,7 @@
 #include<memory>
 #include<functional>
 #include <Interface\IAbstractUIFacrory.h>
+#include <CommonUI/IDbBrowser.h>
 #include"ConnectionAttributes.h"
 
 // Диалоговое окно DlgConnectionSqlSvr
@@ -25,7 +26,9 @@ protected:
 	DECLARE_MESSAGE_MAP()
 private:
 	std::function<ODS::UI::IAbstractUIFacrory * (void)> m_uiFactoryGetter;
+	std::unique_ptr<ODS::Resources::ISqlBrowser> m_sqlBrowser;
 	std::shared_ptr<DrvFTSQLHdaItem::ConnectionAttributes> m_connectAttributes;
+	std::vector<std::string> m_databasesList;
 	CComboBox m_cbServer;
 	CComboBox m_cbAuth;
 	CEdit m_editUserName;
@@ -40,4 +43,5 @@ public:
 	afx_msg void OnBnClickedButtonTestconnection();
 	afx_msg void OnBnClickedCancel();
 	afx_msg void OnBnClickedOk();
+	afx_msg void OnCbnSelendokComboServerName();
 };
