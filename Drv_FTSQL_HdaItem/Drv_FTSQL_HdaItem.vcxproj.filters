@@ -58,6 +58,18 @@
     <Filter Include="Исходные файлы\DataAccessLayer\Environment">
       <UniqueIdentifier>{823290dc-b96f-4258-8ec3-4cf407d7eef0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Файлы заголовков\DataAccessLayer\Connection">
+      <UniqueIdentifier>{6d9b7c17-9e51-4b01-8aae-761f1f353360}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\DataAccessLayer\Connection">
+      <UniqueIdentifier>{82e8cd14-411e-4a83-91cc-433b88122f39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\DataAccessLayer\Statement">
+      <UniqueIdentifier>{2034a6a9-0a8a-4629-ba6b-a784cdd6a6ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\DataAccessLayer\Statement">
+      <UniqueIdentifier>{0490e136-dbe4-4d37-b018-a7ac48594c01}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Drv_FTSQL_HdaItem.cpp">
@@ -93,9 +105,6 @@
     <ClCompile Include="Export.cpp">
       <Filter>Исходные файлы\Plugin</Filter>
     </ClCompile>
-    <ClCompile Include="ConnectionAttributes.cpp">
-      <Filter>Исходные файлы\DataAccessLayer</Filter>
-    </ClCompile>
     <ClCompile Include="XMLSettingsDataSource.cpp">
       <Filter>Исходные файлы\DataAccessLayer\SettingsDataSource</Filter>
     </ClCompile>
@@ -104,6 +113,30 @@
     </ClCompile>
     <ClCompile Include="SQLServerEnvironment.cpp">
       <Filter>Исходные файлы\DataAccessLayer\Environment</Filter>
+    </ClCompile>
+    <ClCompile Include="Connection.cpp">
+      <Filter>Исходные файлы\DataAccessLayer\Connection</Filter>
+    </ClCompile>
+    <ClCompile Include="SQLServerConnection.cpp">
+      <Filter>Исходные файлы\DataAccessLayer\Connection</Filter>
+    </ClCompile>
+    <ClCompile Include="Log.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="ConnectionAttributes.cpp">
+      <Filter>Исходные файлы\DataAccessLayer\Connection</Filter>
+    </ClCompile>
+    <ClCompile Include="Record.cpp">
+      <Filter>Исходные файлы\DataAccessLayer\Statement</Filter>
+    </ClCompile>
+    <ClCompile Include="Statement.cpp">
+      <Filter>Исходные файлы\DataAccessLayer\Statement</Filter>
+    </ClCompile>
+    <ClCompile Include="SQLServerStatement.cpp">
+      <Filter>Исходные файлы\DataAccessLayer\Statement</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -160,9 +193,6 @@
     <ClInclude Include="Export.h">
       <Filter>Файлы заголовков\Plugin</Filter>
     </ClInclude>
-    <ClInclude Include="ConnectionAttributes.h">
-      <Filter>Файлы заголовков\DataAccessLayer</Filter>
-    </ClInclude>
     <ClInclude Include="ISettingsDataSource.h">
       <Filter>Файлы заголовков\DataAccessLayer\SettingsDataSource</Filter>
     </ClInclude>
@@ -174,6 +204,30 @@
     </ClInclude>
     <ClInclude Include="SQLServerEnvironment.h">
       <Filter>Файлы заголовков\DataAccessLayer\Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="Connection.h">
+      <Filter>Файлы заголовков\DataAccessLayer\Connection</Filter>
+    </ClInclude>
+    <ClInclude Include="SQLServerConnection.h">
+      <Filter>Файлы заголовков\DataAccessLayer\Connection</Filter>
+    </ClInclude>
+    <ClInclude Include="Log.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="ConnectionAttributes.h">
+      <Filter>Файлы заголовков\DataAccessLayer\Connection</Filter>
+    </ClInclude>
+    <ClInclude Include="Record.h">
+      <Filter>Файлы заголовков\DataAccessLayer\Statement</Filter>
+    </ClInclude>
+    <ClInclude Include="Statement.h">
+      <Filter>Файлы заголовков\DataAccessLayer\Statement</Filter>
+    </ClInclude>
+    <ClInclude Include="SQLServerStatement.h">
+      <Filter>Файлы заголовков\DataAccessLayer\Statement</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
