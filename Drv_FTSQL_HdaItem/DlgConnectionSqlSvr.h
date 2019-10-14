@@ -36,6 +36,7 @@ private:
 	CComboBox m_cbDatabase;
 	CEdit m_editDataQuality;
 	CEdit m_editDays;
+	BOOL OnInitDialog() override;
 public:
 	afx_msg void OnCbnDropdownComboServerName();
 	afx_msg void OnCbnSelchangeComboAuthType();

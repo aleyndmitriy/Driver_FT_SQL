@@ -48,6 +48,39 @@ BEGIN_MESSAGE_MAP(DlgConnectionSqlSvr, CDialogEx)
 END_MESSAGE_MAP()
 
 
+BOOL DlgConnectionSqlSvr::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+	if (!m_connectAttributes->serverName.empty()) {
+		int ind = m_cbServer.AddString(m_connectAttributes->serverName.c_str());
+		m_cbServer.SetCurSel(ind);
+	}
+	if (!m_connectAttributes->databaseName.empty()) {
+		int ind = m_cbDatabase.AddString(m_connectAttributes->databaseName.c_str());
+		m_cbDatabase.SetCurSel(ind);
+	}
+	m_editUserName.SetSel(0, -1);
+	m_editUserName.Clear();
+	m_editPassword.SetSel(0, -1);
+	m_editPassword.Clear();
+	if (m_connectAttributes->isServerAuthentication) {
+		m_cbAuth.SetCurSel(1);
+		m_editUserName.EnableWindow(TRUE);
+		m_editPassword.EnableWindow(TRUE);
+		if (!m_connectAttributes->loginName.empty()) {
+			m_editUserName.SetWindowTextA(m_connectAttributes->loginName.c_str());
+		}
+		if (!m_connectAttributes->password.empty()) {
+			m_editPassword.SetWindowTextA(m_connectAttributes->password.c_str());
+		}
+	}
+	else {
+		m_cbAuth.SetCurSel(0);
+		m_editUserName.EnableWindow(FALSE);
+		m_editPassword.EnableWindow(FALSE);
+	}
+	return TRUE;
+}
 // Обработчики сообщений DlgConnectionSqlSvr
 
 
@@ -66,7 +99,9 @@ void DlgConnectionSqlSvr::OnCbnSelchangeComboAuthType()
 {
 	int index = m_cbAuth.GetCurSel();
 	if (!index) {
+		m_editUserName.SetSel(0, -1);
 		m_editUserName.Clear();
+		m_editPassword.SetSel(0, -1);
 		m_editPassword.Clear();
 		m_editUserName.EnableWindow(FALSE);
 		m_editPassword.EnableWindow(FALSE);
@@ -80,7 +115,7 @@ void DlgConnectionSqlSvr::OnCbnSelchangeComboAuthType()
 
 void DlgConnectionSqlSvr::OnCbnDropdownComboDatabase()
 {
-	// TODO: добавьте свой код обработчика уведомлений
+	
 }
 
 
@@ -100,8 +135,34 @@ void DlgConnectionSqlSvr::OnBnClickedCancel()
 void DlgConnectionSqlSvr::OnBnClickedOk()
 {
 	int index = m_cbServer.GetCurSel();
-	TCHAR * server = (TCHAR*)m_cbServer.GetItemData(index);
-
+	CString str;
+	int len = m_cbServer.GetWindowTextLengthA();
+	m_cbServer.GetWindowTextA(str);
+	m_connectAttributes->serverName = std::string(str.GetBuffer(len));
+	str.ReleaseBuffer();
+	str.Empty();
+	index = m_cbAuth.GetCurSel();
+	if (!index) {
+		m_connectAttributes->loginName.clear();
+		m_connectAttributes->password.clear();
+		m_connectAttributes->isServerAuthentication = false;
+	}
+	else {
+		m_editUserName.GetWindowTextA(str);
+		m_connectAttributes->loginName = std::string(str.GetBuffer());
+		str.ReleaseBuffer();
+		str.Empty();
+		m_editPassword.GetWindowTextA(str);
+		m_connectAttributes->password = std::string(str.GetBuffer());
+		str.ReleaseBuffer();
+		str.Empty();
+		m_connectAttributes->isServerAuthentication = true;
+	}
+	len = m_cbDatabase.GetWindowTextLengthA();
+	m_cbDatabase.GetWindowTextA(str);
+	m_connectAttributes->databaseName = std::string(str.GetBuffer(len));
+	str.ReleaseBuffer();
+	str.Empty();
 	CDialogEx::OnOK();
 }
 
