@@ -10,6 +10,8 @@ namespace DrvFTSQLHdaItem
 		std::string loginName;
 		std::string password;
 		bool isServerAuthentication;
+		std::string dataQuality;
+		std::string daysBack;
 		ConnectionAttributes();
 		ConnectionAttributes(const ConnectionAttributes& src) = default;
 		ConnectionAttributes& operator=(const ConnectionAttributes& rhs) = default;

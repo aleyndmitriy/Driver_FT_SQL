@@ -4,10 +4,10 @@
 #include <Interface\IAbstractUIFacrory.h>
 #include <CommonUI/IDbBrowser.h>
 #include"ConnectionAttributes.h"
-
+#include"SQLServerDatabaseEngine.h"
 // Диалоговое окно DlgConnectionSqlSvr
 
-class DlgConnectionSqlSvr : public CDialogEx
+class DlgConnectionSqlSvr :  public CDialogEx
 {
 	DECLARE_DYNAMIC(DlgConnectionSqlSvr)
 
@@ -28,7 +28,7 @@ private:
 	std::function<ODS::UI::IAbstractUIFacrory * (void)> m_uiFactoryGetter;
 	std::unique_ptr<ODS::Resources::ISqlBrowser> m_sqlBrowser;
 	std::shared_ptr<DrvFTSQLHdaItem::ConnectionAttributes> m_connectAttributes;
-	std::vector<std::string> m_databasesList;
+	std::shared_ptr<DrvFTSQLHdaItem::IDatabaseEngine> m_database;
 	CComboBox m_cbServer;
 	CComboBox m_cbAuth;
 	CEdit m_editUserName;
@@ -37,6 +37,14 @@ private:
 	CEdit m_editDataQuality;
 	CEdit m_editDays;
 	BOOL OnInitDialog() override;
+	void LoadDatabasesList(const std::vector<std::string>& databases);
+	void WarningMessage(std::string message);
+	void ErrorMessage(std::string message);
+	void StartLoading();
+	void StopLoading();
+	void ConnectToServer();
+	void CheckConnectToDatabase();
+	void ReadAttributes();
 public:
 	afx_msg void OnCbnDropdownComboServerName();
 	afx_msg void OnCbnSelchangeComboAuthType();

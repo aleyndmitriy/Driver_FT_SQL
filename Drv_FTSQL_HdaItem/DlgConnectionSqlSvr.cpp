@@ -6,22 +6,23 @@
 #include "DlgConnectionSqlSvr.h"
 #include "afxdialogex.h"
 
-
 // Диалоговое окно DlgConnectionSqlSvr
 
 IMPLEMENT_DYNAMIC(DlgConnectionSqlSvr, CDialogEx)
 
 DlgConnectionSqlSvr::DlgConnectionSqlSvr(std::function<ODS::UI::IAbstractUIFacrory * (void)> uiFactiryGetter, std::shared_ptr<DrvFTSQLHdaItem::ConnectionAttributes> attributes, CWnd* pParent)
-	: CDialogEx(IDD_CONNECTION_SQL_SVR, pParent), m_uiFactoryGetter(uiFactiryGetter), m_sqlBrowser(nullptr), m_connectAttributes(attributes), m_databasesList()
+	: CDialogEx(IDD_CONNECTION_SQL_SVR, pParent), m_uiFactoryGetter(uiFactiryGetter), m_sqlBrowser(nullptr),
+	m_connectAttributes(attributes), m_database(std::make_shared<DrvFTSQLHdaItem::SQLServerDatabaseEngine>())
 {
-
+	
+	
 }
 
 DlgConnectionSqlSvr::~DlgConnectionSqlSvr()
 {
 	m_connectAttributes.reset();
 	m_sqlBrowser.reset();
-	m_databasesList.clear();
+	m_database.reset();
 }
 
 void DlgConnectionSqlSvr::DoDataExchange(CDataExchange* pDX)
@@ -79,6 +80,7 @@ BOOL DlgConnectionSqlSvr::OnInitDialog()
 		m_editUserName.EnableWindow(FALSE);
 		m_editPassword.EnableWindow(FALSE);
 	}
+
 	return TRUE;
 }
 // Обработчики сообщений DlgConnectionSqlSvr
@@ -91,7 +93,7 @@ void DlgConnectionSqlSvr::OnCbnDropdownComboServerName()
 	m_cbServer.SetItemData(pos, 0);
 	pos = m_cbServer.AddString(TEXT("<Browse for more...>"));
 	m_cbServer.SetItemData(pos, 1);
-	m_databasesList.clear();
+	m_cbDatabase.ResetContent();
 }
 
 
@@ -115,13 +117,13 @@ void DlgConnectionSqlSvr::OnCbnSelchangeComboAuthType()
 
 void DlgConnectionSqlSvr::OnCbnDropdownComboDatabase()
 {
-	
+	ConnectToServer();
 }
 
 
 void DlgConnectionSqlSvr::OnBnClickedButtonTestconnection()
 {
-	// TODO: добавьте свой код обработчика уведомлений
+	CheckConnectToDatabase();
 }
 
 
@@ -131,17 +133,15 @@ void DlgConnectionSqlSvr::OnBnClickedCancel()
 	CDialogEx::OnCancel();
 }
 
-
-void DlgConnectionSqlSvr::OnBnClickedOk()
+void DlgConnectionSqlSvr::ReadAttributes()
 {
-	int index = m_cbServer.GetCurSel();
 	CString str;
 	int len = m_cbServer.GetWindowTextLengthA();
 	m_cbServer.GetWindowTextA(str);
 	m_connectAttributes->serverName = std::string(str.GetBuffer(len));
 	str.ReleaseBuffer();
 	str.Empty();
-	index = m_cbAuth.GetCurSel();
+	int index = m_cbAuth.GetCurSel();
 	if (!index) {
 		m_connectAttributes->loginName.clear();
 		m_connectAttributes->password.clear();
@@ -163,6 +163,17 @@ void DlgConnectionSqlSvr::OnBnClickedOk()
 	m_connectAttributes->databaseName = std::string(str.GetBuffer(len));
 	str.ReleaseBuffer();
 	str.Empty();
+	m_editDataQuality.GetWindowTextA(str);
+	m_connectAttributes->dataQuality = std::string(str.GetBuffer());
+	str.ReleaseBuffer();
+	str.Empty();
+	m_editDays.GetWindowTextA(str);
+	m_connectAttributes->daysBack = std::string(str.GetBuffer());
+}
+
+void DlgConnectionSqlSvr::OnBnClickedOk()
+{
+	ReadAttributes();
 	CDialogEx::OnOK();
 }
 
@@ -198,4 +209,78 @@ void DlgConnectionSqlSvr::OnCbnSelendokComboServerName()
 		m_cbServer.SetCurSel(0);
 	}
 	m_sqlBrowser.reset();
+}
+
+void DlgConnectionSqlSvr::LoadDatabasesList(const std::vector<std::string>& databases)
+{
+	m_cbDatabase.ResetContent();
+	size_t index = 0;
+	for (std::vector<std::string>::const_iterator itr = databases.cbegin(); itr != databases.cend(); ++itr)
+	{
+		int pos = m_cbDatabase.AddString(itr->c_str());
+		m_cbDatabase.SetItemData(pos, index++);
+	}
+}
+
+void DlgConnectionSqlSvr::WarningMessage(std::string message)
+{
+	MessageBox(TEXT(message.c_str()), "Warning", MB_ICONWARNING);
+}
+
+void DlgConnectionSqlSvr::ErrorMessage(std::string message)
+{
+	MessageBox(TEXT(message.c_str()), "Warning", MB_ICONSTOP);
+}
+
+
+void DlgConnectionSqlSvr::StartLoading()
+{
+	HCURSOR hCurs = LoadCursor(NULL, IDC_WAIT);
+	SetCursor(hCurs);
+}
+
+void DlgConnectionSqlSvr::StopLoading()
+{
+	HCURSOR hCurs = LoadCursor(NULL, IDC_ARROW);
+	SetCursor(hCurs);
+}
+
+void DlgConnectionSqlSvr::ConnectToServer()
+{
+	StartLoading();
+	ReadAttributes();
+	if (m_database->OpenConnectionIfNeeded(*m_connectAttributes)) {
+		LoadDatabasesList(m_database->GetDatabasesList());
+	}
+	StopLoading();
+}
+
+void DlgConnectionSqlSvr::CheckConnectToDatabase()
+{
+	StartLoading();
+	ReadAttributes();
+	std::vector<std::string> databaseNames;
+	LoadDatabasesList(databaseNames);
+	m_database->CloseConnection();
+		if (m_connectAttributes->driver.empty()) {
+			m_connectAttributes->driver = std::string("SQL Server Native Client 11.0");
+		}
+		if (!m_connectAttributes->serverName.empty()) {
+			if (!m_database->OpenConnectionIfNeeded(*m_connectAttributes)) {
+				databaseNames.clear();
+				LoadDatabasesList(databaseNames);
+				StopLoading();
+				ErrorMessage(std::string("Connection Test Failed!"));
+			}
+			else {
+				databaseNames = m_database->GetDatabasesList();
+				LoadDatabasesList(databaseNames);
+				StopLoading();
+				WarningMessage(std::string("Connection Test Succeed!"));
+			}
+		}
+		else {
+			StopLoading();
+			ErrorMessage(std::string("Empty fields!"));
+		}
 }

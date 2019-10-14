@@ -1,7 +1,7 @@
 #include "pch.h"
 #include"ConnectionAttributes.h"
 
-DrvFTSQLHdaItem::ConnectionAttributes::ConnectionAttributes() :driver(), serverName(), databaseName(), loginName(), password(), isServerAuthentication(false)
+DrvFTSQLHdaItem::ConnectionAttributes::ConnectionAttributes() :driver(), serverName(), databaseName(), loginName(), password(), isServerAuthentication(false), dataQuality(), daysBack()
 {
 
 }
