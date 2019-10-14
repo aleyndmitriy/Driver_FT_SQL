@@ -52,6 +52,12 @@
     <Filter Include="Исходные файлы\pugixml">
       <UniqueIdentifier>{0de90957-8067-4b91-b47b-5e3ede345955}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Файлы заголовков\DataAccessLayer\Environment">
+      <UniqueIdentifier>{57ad7602-da80-4c32-abd1-a6d171efef9f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\DataAccessLayer\Environment">
+      <UniqueIdentifier>{823290dc-b96f-4258-8ec3-4cf407d7eef0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Drv_FTSQL_HdaItem.cpp">
@@ -95,6 +101,9 @@
     </ClCompile>
     <ClCompile Include="pugixml.cpp">
       <Filter>Исходные файлы\pugixml</Filter>
+    </ClCompile>
+    <ClCompile Include="SQLServerEnvironment.cpp">
+      <Filter>Исходные файлы\DataAccessLayer\Environment</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -159,6 +168,12 @@
     </ClInclude>
     <ClInclude Include="XMLSettingsDataSource.h">
       <Filter>Файлы заголовков\DataAccessLayer\SettingsDataSource</Filter>
+    </ClInclude>
+    <ClInclude Include="IEnvironment.h">
+      <Filter>Файлы заголовков\DataAccessLayer\Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="SQLServerEnvironment.h">
+      <Filter>Файлы заголовков\DataAccessLayer\Environment</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
