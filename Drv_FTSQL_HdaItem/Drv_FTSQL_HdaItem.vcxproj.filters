@@ -70,6 +70,12 @@
     <Filter Include="Исходные файлы\DataAccessLayer\Statement">
       <UniqueIdentifier>{0490e136-dbe4-4d37-b018-a7ac48594c01}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Файлы заголовков\DataAccessLayer\DatabaseEngine">
+      <UniqueIdentifier>{ec0f7c9a-8330-464a-af23-514a8d0aef88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\DataAccessLayer\DatabaseEngine">
+      <UniqueIdentifier>{436a82fc-99d8-492c-a34f-b5520ddcb342}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Drv_FTSQL_HdaItem.cpp">
@@ -137,6 +143,9 @@
     </ClCompile>
     <ClCompile Include="SQLServerStatement.cpp">
       <Filter>Исходные файлы\DataAccessLayer\Statement</Filter>
+    </ClCompile>
+    <ClCompile Include="SQLServerDatabaseEngine.cpp">
+      <Filter>Исходные файлы\DataAccessLayer\DatabaseEngine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -228,6 +237,12 @@
     </ClInclude>
     <ClInclude Include="SQLServerStatement.h">
       <Filter>Файлы заголовков\DataAccessLayer\Statement</Filter>
+    </ClInclude>
+    <ClInclude Include="DatabaseEngine.h">
+      <Filter>Файлы заголовков\DataAccessLayer\DatabaseEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="SQLServerDatabaseEngine.h">
+      <Filter>Файлы заголовков\DataAccessLayer\DatabaseEngine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

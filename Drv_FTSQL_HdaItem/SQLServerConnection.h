@@ -26,6 +26,7 @@ namespace DrvFTSQLHdaItem {
 		std::vector<std::string> GetDatabaseList() const override;
 		bool IsValidConnection() const override;
 		ConnectionStatus GetConnectionStatus() const override;
+		static std::shared_ptr<SQLServerConnection> CreateConnectionToDatabase(const std::shared_ptr<SQLServerEnvironment>& environment, const ConnectionAttributes& attributes);
 	private:
 		SQLHDBC m_sqlDBC;
 		void freeConnection();
@@ -33,6 +34,5 @@ namespace DrvFTSQLHdaItem {
 		std::string HandleDiagnosticRecord();
 		std::vector<std::string> serverList;
 		std::vector<std::string> databaseList;
-		static std::shared_ptr<SQLServerConnection> CreateConnectionToDatabase(const std::shared_ptr<SQLServerEnvironment> & environment, const ConnectionAttributes & attributes);
 	};
 }

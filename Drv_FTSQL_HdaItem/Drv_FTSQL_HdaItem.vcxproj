@@ -214,6 +214,7 @@
     <ClCompile Include="RegisterInfo.cpp" />
     <ClCompile Include="ServerHdaItem.cpp" />
     <ClCompile Include="SQLServerConnection.cpp" />
+    <ClCompile Include="SQLServerDatabaseEngine.cpp" />
     <ClCompile Include="SQLServerEnvironment.cpp" />
     <ClCompile Include="SQLServerStatement.cpp" />
     <ClCompile Include="Statement.cpp" />
@@ -229,6 +230,7 @@
     <ClInclude Include="Connection.h" />
     <ClInclude Include="ConnectionAttributes.h" />
     <ClInclude Include="Constants.h" />
+    <ClInclude Include="DatabaseEngine.h" />
     <ClInclude Include="DlgConnectionSqlSvr.h" />
     <ClInclude Include="Drv_FTSQL_HdaItem.h" />
     <ClInclude Include="DsConfigurator.h" />
@@ -246,6 +248,7 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="ServerHdaItem.h" />
     <ClInclude Include="SQLServerConnection.h" />
+    <ClInclude Include="SQLServerDatabaseEngine.h" />
     <ClInclude Include="SQLServerEnvironment.h" />
     <ClInclude Include="SQLServerStatement.h" />
     <ClInclude Include="Statement.h" />
