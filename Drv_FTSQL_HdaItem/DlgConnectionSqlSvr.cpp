@@ -80,7 +80,12 @@ BOOL DlgConnectionSqlSvr::OnInitDialog()
 		m_editUserName.EnableWindow(FALSE);
 		m_editPassword.EnableWindow(FALSE);
 	}
-
+	if (!m_connectAttributes->dataQuality.empty()) {
+		m_editDataQuality.SetWindowTextA(m_connectAttributes->dataQuality.c_str());
+	}
+	if (!m_connectAttributes->daysBack.empty()) {
+		m_editDays.SetWindowTextA(m_connectAttributes->daysBack.c_str());
+	}
 	return TRUE;
 }
 // Обработчики сообщений DlgConnectionSqlSvr
@@ -169,6 +174,8 @@ void DlgConnectionSqlSvr::ReadAttributes()
 	str.Empty();
 	m_editDays.GetWindowTextA(str);
 	m_connectAttributes->daysBack = std::string(str.GetBuffer());
+	str.ReleaseBuffer();
+	str.Empty();
 }
 
 void DlgConnectionSqlSvr::OnBnClickedOk()

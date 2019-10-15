@@ -14,6 +14,9 @@ bool DrvFTSQLHdaItem::XMLSettingsDataSource::Save(const ConnectionAttributes& at
 	connectionNode.append_attribute("User").set_value(attributes.loginName.c_str());
 	std::string encryptPass = attributes.password;
 	connectionNode.append_attribute("Password").set_value(encryptPass.c_str());
+	pugi::xml_node daysNode = rootNode.append_child("Data");
+	daysNode.append_attribute("DataQuality").set_value(attributes.dataQuality.c_str());
+	daysNode.append_attribute("DaysBack").set_value(attributes.daysBack.c_str());
 	doc.save(stream);
 	return true;
 }
@@ -34,6 +37,9 @@ bool DrvFTSQLHdaItem::XMLSettingsDataSource::Load(ConnectionAttributes& attribut
 	attributes.loginName = std::string(connectionNode.attribute("User").as_string());
 	std::string pass = std::string(connectionNode.attribute("Password").as_string());
 	attributes.password = pass;
+	pugi::xml_node daysNode = rootNode.child("Data");
+	attributes.dataQuality = std::string(daysNode.attribute("DataQuality").as_string());
+	attributes.daysBack = std::string(daysNode.attribute("DaysBack").as_string());
 	return true;
 }
 
@@ -53,6 +59,9 @@ bool DrvFTSQLHdaItem::XMLSettingsDataSource::LoadAttributesString(const char* so
 	attributes.loginName = std::string(connectionNode.attribute("User").as_string());
 	std::string pass = std::string(connectionNode.attribute("Password").as_string());
 	attributes.password = pass;
+	pugi::xml_node daysNode = rootNode.child("Data");
+	attributes.dataQuality = std::string(daysNode.attribute("DataQuality").as_string());
+	attributes.daysBack = std::string(daysNode.attribute("DaysBack").as_string());
 	return true;
 }
 
@@ -68,6 +77,9 @@ bool DrvFTSQLHdaItem::XMLSettingsDataSource::SaveAttributesString(const Connecti
 	connectionNode.append_attribute("User").set_value(attributes.loginName.c_str());
 	std::string encryptPass = attributes.password;
 	connectionNode.append_attribute("Password").set_value(encryptPass.c_str());
+	pugi::xml_node daysNode = rootNode.append_child("Data");
+	daysNode.append_attribute("DataQuality").set_value(attributes.dataQuality.c_str());
+	daysNode.append_attribute("DaysBack").set_value(attributes.daysBack.c_str());
 	doc.save(stream);
 	return true;
 }
