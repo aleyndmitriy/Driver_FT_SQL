@@ -200,6 +200,7 @@
     <ClCompile Include="DsConfigurator.cpp" />
     <ClCompile Include="DSource.cpp" />
     <ClCompile Include="Export.cpp" />
+    <ClCompile Include="HdaCommandHandler.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -237,6 +238,7 @@
     <ClInclude Include="DSource.h" />
     <ClInclude Include="Export.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="HdaCommandHandler.h" />
     <ClInclude Include="IEnvironment.h" />
     <ClInclude Include="ISettingsDataSource.h" />
     <ClInclude Include="Log.h" />
@@ -251,6 +253,7 @@
     <ClInclude Include="SQLServerDatabaseEngine.h" />
     <ClInclude Include="SQLServerEnvironment.h" />
     <ClInclude Include="SQLServerStatement.h" />
+    <ClInclude Include="SQLServerTagRecordsDAO.h" />
     <ClInclude Include="Statement.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Utils.h" />

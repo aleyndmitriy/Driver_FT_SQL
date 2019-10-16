@@ -28,7 +28,7 @@ private:
 	std::function<ODS::UI::IAbstractUIFacrory * (void)> m_uiFactoryGetter;
 	std::unique_ptr<ODS::Resources::ISqlBrowser> m_sqlBrowser;
 	std::shared_ptr<DrvFTSQLHdaItem::ConnectionAttributes> m_connectAttributes;
-	std::shared_ptr<DrvFTSQLHdaItem::IDatabaseEngine> m_database;
+	std::unique_ptr<DrvFTSQLHdaItem::IDatabaseEngine> m_database;
 	CComboBox m_cbServer;
 	CComboBox m_cbAuth;
 	CEdit m_editUserName;

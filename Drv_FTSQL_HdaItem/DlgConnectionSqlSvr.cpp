@@ -12,7 +12,7 @@ IMPLEMENT_DYNAMIC(DlgConnectionSqlSvr, CDialogEx)
 
 DlgConnectionSqlSvr::DlgConnectionSqlSvr(std::function<ODS::UI::IAbstractUIFacrory * (void)> uiFactiryGetter, std::shared_ptr<DrvFTSQLHdaItem::ConnectionAttributes> attributes, CWnd* pParent)
 	: CDialogEx(IDD_CONNECTION_SQL_SVR, pParent), m_uiFactoryGetter(uiFactiryGetter), m_sqlBrowser(nullptr),
-	m_connectAttributes(attributes), m_database(std::make_shared<DrvFTSQLHdaItem::SQLServerDatabaseEngine>())
+	m_connectAttributes(attributes), m_database(std::make_unique<DrvFTSQLHdaItem::SQLServerDatabaseEngine>())
 {
 	
 	

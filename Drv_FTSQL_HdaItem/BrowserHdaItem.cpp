@@ -6,6 +6,10 @@
 #include"XMLSettingsDataSource.h"
 
 
+DrvFTSQLHdaItem::BrowserHdaItem::BrowserHdaItem():m_database(std::make_unique<DrvFTSQLHdaItem::SQLServerDatabaseEngine>()),m_attributes(),m_TagList()
+{
+
+}
 
 void* DrvFTSQLHdaItem::BrowserHdaItem::GetInterface(int nIfcId)
 {
@@ -19,7 +23,7 @@ int DrvFTSQLHdaItem::BrowserHdaItem::Init(TCHAR* szCfgString)
 	{
 		size_t len = _tcslen(szCfgString);
 		if (len > 0) {
-			settingSource.LoadAttributesString(szCfgString, len, attributes);
+			settingSource.LoadAttributesString(szCfgString, len, m_attributes);
 		}
 	}
 	
@@ -53,6 +57,9 @@ int DrvFTSQLHdaItem::BrowserHdaItem::GetBrowseItemList(const ODS::ItemAddress* p
 
 			ODS::ItemAddress* pAddr = (ODS::ItemAddress*)pAddress;
 
+			TCHAR* plain = NULL;
+			int res = pAddr->GetPlainAddress(&plain);
+			
 	
 			pAddr->GetAddress(&pAddrComponent, &nCount, &nIndex);
 
@@ -134,12 +141,3 @@ int DrvFTSQLHdaItem::BrowserHdaItem::GetTagList(std::vector<ODS::OdsString>& rEn
 	return ODS::ERR::OK;
 }
 
-int DrvFTSQLHdaItem::BrowserHdaItem::GetNextTagLevel(SQLHANDLE hConn, int nItemID, int nLevel, std::vector<ODS::OdsString>& rEntry, std::vector<STagItem>* pTagList)
-{
-	return ODS::ERR::OK;
-}
-
-int DrvFTSQLHdaItem::BrowserHdaItem::GetItemTagList(SQLHANDLE hConn, int nItemID, std::vector<ODS::OdsString>& rEntry, std::vector<STagItem>* pTagList)
-{
-	return ODS::ERR::OK;
-}

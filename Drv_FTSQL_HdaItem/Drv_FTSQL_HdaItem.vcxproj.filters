@@ -76,6 +76,12 @@
     <Filter Include="Исходные файлы\DataAccessLayer\DatabaseEngine">
       <UniqueIdentifier>{436a82fc-99d8-492c-a34f-b5520ddcb342}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Файлы заголовков\DataAccessLayer\TagRecordsDAO">
+      <UniqueIdentifier>{08e5f03e-8798-4472-a312-9732df76005c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\DataAccessLayer\TagRecordsDAO">
+      <UniqueIdentifier>{4fd625e1-35e9-458a-8e27-372c1f39f752}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Drv_FTSQL_HdaItem.cpp">
@@ -146,6 +152,9 @@
     </ClCompile>
     <ClCompile Include="SQLServerDatabaseEngine.cpp">
       <Filter>Исходные файлы\DataAccessLayer\DatabaseEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="HdaCommandHandler.cpp">
+      <Filter>Исходные файлы\Server</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -243,6 +252,12 @@
     </ClInclude>
     <ClInclude Include="SQLServerDatabaseEngine.h">
       <Filter>Файлы заголовков\DataAccessLayer\DatabaseEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="HdaCommandHandler.h">
+      <Filter>Файлы заголовков\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="SQLServerTagRecordsDAO.h">
+      <Filter>Файлы заголовков\DataAccessLayer\TagRecordsDAO</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

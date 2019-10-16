@@ -1,5 +1,6 @@
 #pragma once
 #include<IServerHda.h>
+#include"HdaCommandHandler.h"
 
 namespace DrvFTSQLHdaItem
 {
@@ -13,5 +14,8 @@ namespace DrvFTSQLHdaItem
 		int IsHdaFunctionSupported(int nFuncType) override;
 		int Execute(ODS::HdaCommand* pCommand, ODS::HdaCommandResult** ppResult) override;
 		int DestroyResult(ODS::HdaCommandResult* pResult) override;
+	private:
+		ConnectionAttributes m_attributes;
+		HdaCommandHandler m_commandHandler;
 	};
 }
