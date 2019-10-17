@@ -202,6 +202,8 @@
     <ClCompile Include="Export.cpp" />
     <ClCompile Include="HdaCommandHandler.cpp" />
     <ClCompile Include="Log.cpp" />
+    <ClCompile Include="ParamValue.cpp" />
+    <ClCompile Include="ParamValueList.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -218,6 +220,7 @@
     <ClCompile Include="SQLServerDatabaseEngine.cpp" />
     <ClCompile Include="SQLServerEnvironment.cpp" />
     <ClCompile Include="SQLServerStatement.cpp" />
+    <ClCompile Include="SQLServerTagRecordsDAO.cpp" />
     <ClCompile Include="Statement.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="XMLSettingsDataSource.cpp" />
@@ -242,6 +245,8 @@
     <ClInclude Include="IEnvironment.h" />
     <ClInclude Include="ISettingsDataSource.h" />
     <ClInclude Include="Log.h" />
+    <ClInclude Include="ParamValue.h" />
+    <ClInclude Include="ParamValueList.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PluginObjectFactory.h" />
     <ClInclude Include="PropertySet.h" />

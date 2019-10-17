@@ -156,6 +156,15 @@
     <ClCompile Include="HdaCommandHandler.cpp">
       <Filter>Исходные файлы\Server</Filter>
     </ClCompile>
+    <ClCompile Include="ParamValue.cpp">
+      <Filter>Исходные файлы\Server</Filter>
+    </ClCompile>
+    <ClCompile Include="ParamValueList.cpp">
+      <Filter>Исходные файлы\Server</Filter>
+    </ClCompile>
+    <ClCompile Include="SQLServerTagRecordsDAO.cpp">
+      <Filter>Исходные файлы\DataAccessLayer\TagRecordsDAO</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Drv_FTSQL_HdaItem.def">
@@ -258,6 +267,12 @@
     </ClInclude>
     <ClInclude Include="SQLServerTagRecordsDAO.h">
       <Filter>Файлы заголовков\DataAccessLayer\TagRecordsDAO</Filter>
+    </ClInclude>
+    <ClInclude Include="ParamValue.h">
+      <Filter>Файлы заголовков\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="ParamValueList.h">
+      <Filter>Файлы заголовков\Server</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -2,7 +2,7 @@
 #include"ConnectionAttributes.h"
 #include<HdaCommand.h>
 #include<vector>
-#include<map>
+#include"SQLServerTagRecordsDAO.h"
 
 namespace DrvFTSQLHdaItem
 {
