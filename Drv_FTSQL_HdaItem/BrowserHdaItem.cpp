@@ -3,6 +3,7 @@
 #include <OdsErr.h>
 #include <AddressComponent.h>
 #include <Address.h>
+#include<AddressHelper.h>
 #include"XMLSettingsDataSource.h"
 
 
@@ -35,6 +36,24 @@ int DrvFTSQLHdaItem::BrowserHdaItem::Shut()
 	return ODS::ERR::OK;
 }
 
+ODS::OdsString DrvFTSQLHdaItem::BrowserHdaItem::GetAddressOld(const ODS::ItemAddress& rAddress)
+{
+	ODS::AddressHelper ah(&rAddress);
+
+	int nIndex = 0;
+	std::vector<std::pair<ODS::OdsString, ODS::OdsString>> listAddrCmp;
+	ah.GetAddressAsList(&listAddrCmp, &nIndex);
+
+	for (size_t i = 0; i < listAddrCmp.size(); i++)
+	{
+		if (listAddrCmp[i].first == _T("address_old"))
+			return listAddrCmp[i].second;
+	}
+
+	return _T("");
+}
+
+
 int DrvFTSQLHdaItem::BrowserHdaItem::GetBrowseItemList(const ODS::ItemAddress* pAddress, ODS::BrowseItem** ppList, ULONG* pulCount)
 {
 	int iRes = ODS::ERR::OK;
@@ -57,10 +76,13 @@ int DrvFTSQLHdaItem::BrowserHdaItem::GetBrowseItemList(const ODS::ItemAddress* p
 
 			ODS::ItemAddress* pAddr = (ODS::ItemAddress*)pAddress;
 
-			TCHAR* plain = NULL;
-			int res = pAddr->GetPlainAddress(&plain);
+			ODS::OdsString addressOld = GetAddressOld(*pAddress);
+			if (!addressOld.IsEmpty())
+			{
+				addr.SetPlainAddress((LPCTSTR)addressOld);
+				pAddr = &addr;
+			}
 			
-	
 			pAddr->GetAddress(&pAddrComponent, &nCount, &nIndex);
 
 			for (int ind = 0; ind < nCount; ind++)

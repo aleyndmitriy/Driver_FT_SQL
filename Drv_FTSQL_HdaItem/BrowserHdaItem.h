@@ -33,5 +33,6 @@ namespace DrvFTSQLHdaItem
 		ConnectionAttributes m_attributes;
 		std::vector<STagItem> m_TagList;
 		int GetTagList(std::vector<ODS::OdsString>& rEntry, std::vector<STagItem>* pTagList);
+		ODS::OdsString GetAddressOld(const ODS::ItemAddress& rAddress);
 	};
 }

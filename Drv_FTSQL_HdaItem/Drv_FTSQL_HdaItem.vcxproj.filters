@@ -82,6 +82,12 @@
     <Filter Include="Исходные файлы\DataAccessLayer\TagRecordsDAO">
       <UniqueIdentifier>{4fd625e1-35e9-458a-8e27-372c1f39f752}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Файлы заголовков\DataAccessLayer\Tables">
+      <UniqueIdentifier>{bdbabbcc-6b9e-4296-bf0c-bec48ad5f95f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\DataAccessLayer\Tables">
+      <UniqueIdentifier>{9b0529cd-cc07-4871-93dc-10e19177ba73}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Drv_FTSQL_HdaItem.cpp">
@@ -164,6 +170,12 @@
     </ClCompile>
     <ClCompile Include="SQLServerTagRecordsDAO.cpp">
       <Filter>Исходные файлы\DataAccessLayer\TagRecordsDAO</Filter>
+    </ClCompile>
+    <ClCompile Include="TagItemRecord.cpp">
+      <Filter>Исходные файлы\DataAccessLayer\TagRecordsDAO</Filter>
+    </ClCompile>
+    <ClCompile Include="SQLTable.cpp">
+      <Filter>Исходные файлы\DataAccessLayer\Tables</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -273,6 +285,12 @@
     </ClInclude>
     <ClInclude Include="ParamValueList.h">
       <Filter>Файлы заголовков\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="TagItemRecord.h">
+      <Filter>Файлы заголовков\DataAccessLayer\TagRecordsDAO</Filter>
+    </ClInclude>
+    <ClInclude Include="SQLTable.h">
+      <Filter>Файлы заголовков\DataAccessLayer\Tables</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

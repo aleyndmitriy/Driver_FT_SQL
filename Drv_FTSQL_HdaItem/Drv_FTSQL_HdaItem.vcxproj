@@ -221,7 +221,9 @@
     <ClCompile Include="SQLServerEnvironment.cpp" />
     <ClCompile Include="SQLServerStatement.cpp" />
     <ClCompile Include="SQLServerTagRecordsDAO.cpp" />
+    <ClCompile Include="SQLTable.cpp" />
     <ClCompile Include="Statement.cpp" />
+    <ClCompile Include="TagItemRecord.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="XMLSettingsDataSource.cpp" />
   </ItemGroup>
@@ -259,7 +261,9 @@
     <ClInclude Include="SQLServerEnvironment.h" />
     <ClInclude Include="SQLServerStatement.h" />
     <ClInclude Include="SQLServerTagRecordsDAO.h" />
+    <ClInclude Include="SQLTable.h" />
     <ClInclude Include="Statement.h" />
+    <ClInclude Include="TagItemRecord.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="XMLSettingsDataSource.h" />
