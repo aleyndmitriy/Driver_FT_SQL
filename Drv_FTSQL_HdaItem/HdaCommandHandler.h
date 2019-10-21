@@ -18,9 +18,9 @@ namespace DrvFTSQLHdaItem
 	private:
 		int ExecuteCommand(const ODS::HdaCommand* pCommand, std::vector<ODS::HdaFunctionResult*>* pResultList);
 		int AnalyzeCommand(const ODS::HdaCommand* pCommand, std::map<int, std::vector<ODS::HdaFunction*> >& requestMap);
-		int HandleOpenSession(ODS::HdaFunction* pFunc, ODS::HdaCommandResult** ppResult);
-		int HandleCloseSession(ODS::HdaFunction* pFunc, ODS::HdaCommandResult** ppResult);
+		int HandleOpenSession(ODS::HdaFunction* pFunc, std::vector<ODS::HdaFunctionResult*>* pResultList);
+		int HandleCloseSession(ODS::HdaFunction* pFunc, std::vector<ODS::HdaFunctionResult*>* pResultList);
 		ConnectionAttributes m_attributes;
-
+		std::unique_ptr<SQLServerTagRecordsDAO> m_database;
 	};
 }
