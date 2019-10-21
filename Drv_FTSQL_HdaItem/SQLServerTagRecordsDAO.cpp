@@ -47,11 +47,6 @@ std::unique_ptr<DrvFTSQLHdaItem::SQLTable> DrvFTSQLHdaItem::SQLServerTagRecordsD
 	return ptrData;
 }
 
-std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementValueList(ParamValueList&& param, std::string startTime, std::string endTime, std::string tagName, int tagId)
-{
-	
-	return std::string();
-}
 
 std::map<std::string, DrvFTSQLHdaItem::TagItemRecord> DrvFTSQLHdaItem::SQLServerTagRecordsDAO::GetTags()
 {
@@ -130,4 +125,10 @@ void DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CloseConnectionWithUUID(const std:
 		itr->second.reset();
 		m_dataConnectionsList.erase(itr);
 	}
+}
+
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementValueList(ParamValueList&& param, std::string startTime, std::string endTime, std::string tagName, int tagId)
+{
+
+	return std::string();
 }

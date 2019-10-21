@@ -202,6 +202,7 @@
     <ClCompile Include="Export.cpp" />
     <ClCompile Include="HdaCommandHandler.cpp" />
     <ClCompile Include="Log.cpp" />
+    <ClCompile Include="ParamUtils.cpp" />
     <ClCompile Include="ParamValue.cpp" />
     <ClCompile Include="ParamValueList.cpp" />
     <ClCompile Include="pch.cpp">
@@ -247,6 +248,7 @@
     <ClInclude Include="IEnvironment.h" />
     <ClInclude Include="ISettingsDataSource.h" />
     <ClInclude Include="Log.h" />
+    <ClInclude Include="ParamUtils.h" />
     <ClInclude Include="ParamValue.h" />
     <ClInclude Include="ParamValueList.h" />
     <ClInclude Include="pch.h" />

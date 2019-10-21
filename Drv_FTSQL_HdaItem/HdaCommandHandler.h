@@ -22,5 +22,18 @@ namespace DrvFTSQLHdaItem
 		int HandleCloseSession(ODS::HdaFunction* pFunc, std::vector<ODS::HdaFunctionResult*>* pResultList);
 		ConnectionAttributes m_attributes;
 		std::unique_ptr<SQLServerTagRecordsDAO> m_database;
+		std::string BuildCmdValueList(const ODS::HdaCommand* pCommand, const std::vector<ODS::HdaFunction*>& rFuncList);
+		std::string BuildCmdValueListConditions(const ODS::HdaCommand* pCommand, const std::vector<ODS::HdaFunction*>& rFuncList);
+		std::string BuildCmdFirstValue(const ODS::HdaCommand* pCommand, const std::vector<ODS::HdaFunction*>& rFuncList);
+		std::string BuildCmdLastValue(const ODS::HdaCommand* pCommand, const std::vector<ODS::HdaFunction*>& rFuncList);
+		std::string BuildCmdMinValue(const ODS::HdaCommand* pCommand, const std::vector<ODS::HdaFunction*>& rFuncList);
+		std::string BuildCmdMaxValue(const ODS::HdaCommand* pCommand, const std::vector<ODS::HdaFunction*>& rFuncList);
+		std::string BuildCmdSumValue(const ODS::HdaCommand* pCommand, const std::vector<ODS::HdaFunction*>& rFuncList);
+		std::string BuildCmdAvgValue(const ODS::HdaCommand* pCommand, const std::vector<ODS::HdaFunction*>& rFuncList);
+		std::string BuildCmdTimeStampFirstValue(const ODS::HdaCommand* pCommand, const std::vector<ODS::HdaFunction*>& rFuncList);
+		std::string BuildCmdTimeStampLastValue(const ODS::HdaCommand* pCommand, const std::vector<ODS::HdaFunction*>& rFuncList);
+		std::string BuildCmdTimeStampMaxValue(const ODS::HdaCommand* pCommand, const std::vector<ODS::HdaFunction*>& rFuncList);
+		std::string BuildCmdTimeStampMinValue(const ODS::HdaCommand* pCommand, const std::vector<ODS::HdaFunction*>& rFuncList);
+		ParamValueList GetParameterValueList(const ODS::HdaFunction* pHdaFunc);
 	};
 }

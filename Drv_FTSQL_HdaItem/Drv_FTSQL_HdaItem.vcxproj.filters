@@ -177,6 +177,9 @@
     <ClCompile Include="SQLTable.cpp">
       <Filter>Исходные файлы\DataAccessLayer\Tables</Filter>
     </ClCompile>
+    <ClCompile Include="ParamUtils.cpp">
+      <Filter>Исходные файлы\Server</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Drv_FTSQL_HdaItem.def">
@@ -291,6 +294,9 @@
     </ClInclude>
     <ClInclude Include="SQLTable.h">
       <Filter>Файлы заголовков\DataAccessLayer\Tables</Filter>
+    </ClInclude>
+    <ClInclude Include="ParamUtils.h">
+      <Filter>Файлы заголовков\Server</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

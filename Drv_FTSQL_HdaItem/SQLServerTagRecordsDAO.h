@@ -19,6 +19,7 @@ namespace DrvFTSQLHdaItem
 		SQLServerTagRecordsDAO& operator=(const SQLServerTagRecordsDAO& src) = delete;
 		SQLServerTagRecordsDAO& operator=(SQLServerTagRecordsDAO&& src) = delete;
 		std::string CreateStatementValueList(ParamValueList&& param, std::string startTime, std::string endTime, std::string tagName, int tagId);
+
 		std::map<std::string, TagItemRecord> GetTags();
 		std::string OpenConnection();
 		bool OpenConnectionWithUUID(const std::string& connectionID);
