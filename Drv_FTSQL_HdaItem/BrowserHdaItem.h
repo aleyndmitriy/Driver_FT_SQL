@@ -2,7 +2,7 @@
 #include<IBrowserItem.h>
 #include<BrowseItem.h>
 #include<OdsString.h>
-#include"SQLServerDatabaseEngine.h"
+#include"SQLServerTagRecordsDAO.h"
 #include<vector>
 
 namespace DrvFTSQLHdaItem
@@ -29,7 +29,7 @@ namespace DrvFTSQLHdaItem
 		int GetBrowseItemList(const ODS::ItemAddress* pAddress, ODS::BrowseItem** ppList, ULONG* pulCount) override;
 		int DestroyBrowseItemList(ODS::BrowseItem* pList, ULONG ulCount) override;
 	private:
-		std::unique_ptr<IDatabaseEngine> m_database;
+		std::unique_ptr<SQLServerTagRecordsDAO> m_database;
 		ConnectionAttributes m_attributes;
 		std::vector<STagItem> m_TagList;
 		int GetTagList(std::vector<ODS::OdsString>& rEntry, std::vector<STagItem>* pTagList);

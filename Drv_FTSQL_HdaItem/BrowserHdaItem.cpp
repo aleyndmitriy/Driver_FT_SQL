@@ -1,4 +1,5 @@
 #include "pch.h"
+#include"Constants.h"
 #include"BrowserHdaItem.h"
 #include <OdsErr.h>
 #include <AddressComponent.h>
@@ -7,7 +8,7 @@
 #include"XMLSettingsDataSource.h"
 
 
-DrvFTSQLHdaItem::BrowserHdaItem::BrowserHdaItem():m_database(std::make_unique<DrvFTSQLHdaItem::SQLServerDatabaseEngine>()),m_attributes(),m_TagList()
+DrvFTSQLHdaItem::BrowserHdaItem::BrowserHdaItem():m_database(nullptr),m_attributes(),m_TagList()
 {
 
 }
@@ -27,12 +28,14 @@ int DrvFTSQLHdaItem::BrowserHdaItem::Init(TCHAR* szCfgString)
 			settingSource.LoadAttributesString(szCfgString, len, m_attributes);
 		}
 	}
-	
+	m_database = std::make_unique<SQLServerTagRecordsDAO>(m_attributes, TAG_TABLE_NAME, TAG_FLOAT_VALUE_TABLE_NAME, TAG_STRING_VALUE_TABLE_NAME);
+
 	return ODS::ERR::OK;
 }
 
 int DrvFTSQLHdaItem::BrowserHdaItem::Shut()
 {
+	m_database.reset();
 	return ODS::ERR::OK;
 }
 
@@ -160,6 +163,15 @@ int DrvFTSQLHdaItem::BrowserHdaItem::DestroyBrowseItemList(ODS::BrowseItem* pLis
 
 int DrvFTSQLHdaItem::BrowserHdaItem::GetTagList(std::vector<ODS::OdsString>& rEntry, std::vector<STagItem>* pTagList)
 {
+	pTagList->clear();
+	std::map<std::string, TagItemRecord> tags = m_database->GetTags();
+	for (std::map<std::string, TagItemRecord>::const_iterator itr = tags.cbegin(); itr != tags.cend(); ++itr) {
+		STagItem item;
+		item.m_vAddress.push_back(ODS::OdsString(itr->second.GetTegName().c_str())); 
+		item.m_szDescription = ODS::OdsString(itr->second.GetTegName().c_str());
+		pTagList->push_back(item);
+	}
+
 	return ODS::ERR::OK;
 }
 
