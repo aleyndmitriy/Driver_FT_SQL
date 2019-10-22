@@ -133,8 +133,38 @@ std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementValueList(Pa
 	WHERE TagTable.TagName = '[PLC_CP]PT3_1013.Val' AND DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndTime) > DATEADD(day,-2, '2019-05-29') AND
 DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndTime) < (SELECT MIN(DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndTime)) 
 FROM FloatTable WHERE DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndTime) > '2019-06-16') ORDER BY FloatTable.DateAndTime DESC OFFSET 50 ROWS FETCH NEXT 25 ROWS ONLY*/
-	std::string date = std::string("DATEADD(millisecond,") + std::string("%s.") + std::string(TAG_TABLE_COLUMN_MILLITM) + std::string(",%s.") + std::string(TAG_TABLE_COLUMN_MILLITM) + std::string(")");
-	std::string query = std::string("SELECT ") + std::string("%s") + std::string(".") + std::string(TAG_TABLE_COLUMN_VALUE) + date;
+	std::string date = std::string("DATEADD(millisecond,") + std::string("%s.") + std::string(TAG_TABLE_COLUMN_MILLITM) + std::string(",%s.") + std::string(TAG_TABLE_COLUMN_DATE_TIME) + std::string(")");
+	std::string startDate = std::to_string(startTime.wYear) + std::string("-") + std::to_string(startTime.wMonth) + std::string("-") +
+		std::to_string(startTime.wDay) + std::string(" ") + std::to_string(startTime.wHour) + std::string(":") +
+		std::to_string(startTime.wMinute) + std::string(":") + std::to_string(startTime.wSecond);
+	std::string endDate = std::to_string(endTime.wYear) + std::string("-") + std::to_string(endTime.wMonth) + std::string("-") +
+		std::to_string(endTime.wDay) + std::string(" ") + std::to_string(endTime.wHour) + std::string(":") +
+		std::to_string(endTime.wMinute) + std::string(":") + std::to_string(endTime.wSecond);
+
+	std::string query = std::string("SELECT ") + std::string("%s") + std::string(".") + std::string(TAG_TABLE_COLUMN_VALUE) + date + std::string(" AS ") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) +
+		std::string("FROM %s INNER JOIN ") + std::string(TAG_TABLE_NAME) + std::string("ON %s.") + std::string(TAG_TABLE_COLUMN_TAG_INDEX) + std::string(" = ") + std::string(TAG_TABLE_NAME) + std::string(".") + 
+		std::string(TAG_TABLE_COLUMN_TAG_INDEX) + std::string(" WHERE ") + std::string(TAG_TABLE_NAME) + std::string(".") + std::string(TAG_TABLE_COLUMN_TAG_NAME) + std::string(" = ") +
+		std::string("'") + param.GetAddress() + std::string("' ");
+	std::string startTimeCondition = date + std::string(" > ");
+	if (param.HasPrevPoint()) {
+		startTimeCondition = startTimeCondition + std::string("DATEADD(day, ") + std::string("-") + m_attributes.daysBack + std::string(", '") + startDate + std::string("') ");
+	}
+	else {
+		startTimeCondition = startTimeCondition + std::string(" '") + startDate + std::string("' ");
+	}
+	std::string endTimeCondition;
+	if (param.HasPostPoint()) {
+		endTimeCondition = date + std::string(" <= ") + std::string(" '") + endDate + std::string("' ");
+	}
+	else {
+		endTimeCondition = date + std::string(" < ") + std::string(" '") + endDate + std::string("' ");
+	}
+	if (param.GetLimit().IsLimit()) {
+		std::string limitCondition = std::string(" ASC ");
+		if (param.GetLimit().m_nLimitSide) {
+			limitCondition = std::string(" DESC ");
+		}
+	}
 	return query;
 }
 
