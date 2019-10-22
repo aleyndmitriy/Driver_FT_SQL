@@ -18,8 +18,18 @@ namespace DrvFTSQLHdaItem
 		SQLServerTagRecordsDAO(SQLServerTagRecordsDAO&& src) = delete;
 		SQLServerTagRecordsDAO& operator=(const SQLServerTagRecordsDAO& src) = delete;
 		SQLServerTagRecordsDAO& operator=(SQLServerTagRecordsDAO&& src) = delete;
-		std::string CreateStatementValueList(ParamValueList&& param, std::string startTime, std::string endTime, std::string tagName, int tagId);
-
+		std::string CreateStatementValueList(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime);
+		std::string CreateStatementConditionValueList(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime);
+		std::string CreateStatementLastValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime);
+		std::string CreateStatementFirstValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime);
+		std::string CreateStatementMinValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime);
+		std::string CreateStatementMaxValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime);
+		std::string CreateStatementSumValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime);
+		std::string CreateStatementAvgValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime);
+		std::string CreateStatementTimeStampFirstValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime);
+		std::string CreateStatementTimeStampLastValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime);
+		std::string CreateStatementTimeStampMaxValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime);
+		std::string CreateStatementTimeStampMinValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime);
 		std::map<std::string, TagItemRecord> GetTags();
 		std::string OpenConnection();
 		bool OpenConnectionWithUUID(const std::string& connectionID);

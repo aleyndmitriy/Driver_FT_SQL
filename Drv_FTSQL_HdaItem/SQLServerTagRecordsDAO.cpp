@@ -127,8 +127,69 @@ void DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CloseConnectionWithUUID(const std:
 	}
 }
 
-std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementValueList(ParamValueList&& param, std::string startTime, std::string endTime, std::string tagName, int tagId)
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementValueList(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime)
 {
+	/*SELECT FloatTable.Val, DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndTime) AS 'DateTime' FROM FloatTable INNER JOIN TagTable ON FloatTable.TagIndex = TagTable.TagIndex  
+	WHERE TagTable.TagName = '[PLC_CP]PT3_1013.Val' AND DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndTime) > DATEADD(day,-2, '2019-05-29') AND
+DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndTime) < (SELECT MIN(DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndTime)) 
+FROM FloatTable WHERE DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndTime) > '2019-06-16') ORDER BY FloatTable.DateAndTime DESC OFFSET 50 ROWS FETCH NEXT 25 ROWS ONLY*/
+	std::string date = std::string("DATEADD(millisecond,") + std::string("%s.") + std::string(TAG_TABLE_COLUMN_MILLITM) + std::string(",%s.") + std::string(TAG_TABLE_COLUMN_MILLITM) + std::string(")");
+	std::string query = std::string("SELECT ") + std::string("%s") + std::string(".") + std::string(TAG_TABLE_COLUMN_VALUE) + date;
+	return query;
+}
 
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementConditionValueList(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime)
+{
 	return std::string();
 }
+
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementLastValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime)
+{
+	return std::string();
+}
+
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementFirstValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime)
+{
+	return std::string();
+}
+
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementMinValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime)
+{
+	return std::string();
+}
+
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementMaxValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime)
+{
+	return std::string();
+}
+
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementSumValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime)
+{
+	return std::string();
+}
+
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementAvgValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime)
+{
+	return std::string();
+}
+
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementTimeStampFirstValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime)
+{
+	return std::string();
+}
+
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementTimeStampLastValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime)
+{
+	return std::string();
+}
+
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementTimeStampMaxValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime)
+{
+	return std::string();
+}
+
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementTimeStampMinValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime)
+{
+	return std::string();
+}
+

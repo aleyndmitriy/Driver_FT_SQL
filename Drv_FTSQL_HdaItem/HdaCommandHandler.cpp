@@ -5,6 +5,7 @@
 #include<OdsCoreLib/HdaFunctionHelper.h>
 #include<HdaFunction.h>
 #include <HdaFunctionResult.h>
+
 #include<HdaFunctionTypes.h>
 #include <HdaFunctionParam.h>
 #include"Constants.h"
@@ -67,88 +68,61 @@ int DrvFTSQLHdaItem::HdaCommandHandler::ExecuteCommand(const ODS::HdaCommand* pC
 		ODS::HdaCommandHelper hdaCmdHelper((ODS::HdaCommand*)pCommand);
 		ODS::Core::Uuid sessionId;
 		hdaCmdHelper.GetSessionId(&sessionId);
-		std::vector<std::string> queries;
-		std::string query;
+		SYSTEMTIME currTime;
+		SYSTEMTIME start;
+		SYSTEMTIME end;
+		hdaCmdHelper.GetTimePeriod(&start, &end, &currTime);
+		SYSTEMTIME startUtc, endUtc;
+		ODS::TimeUtils::SysTimeLocalToUtc(start, &startUtc);
+		ODS::TimeUtils::SysTimeLocalToUtc(end, &endUtc);
+		std::map<int, std::vector<std::string> > queriesList;
+		std::pair<int, std::vector<std::string> > pair;
+		std::pair<std::map<int, std::vector<std::string> >::iterator, bool > insertedPair;
 		for (itr = requestMap.cbegin(); itr != requestMap.cend(); ++itr) {
 			switch (itr->first) {
 			case ODS::HdaFunctionType::VALUE_LIST:
-				query = BuildCmdValueList(pCommand, itr->second);
-				if (!query.empty()) {
-					queries.push_back(query);
-				}
+				pair = std::make_pair<int, std::vector<std::string> >(int(ODS::HdaFunctionType::VALUE_LIST), BuildCmdValueList(startUtc, endUtc, itr->second));
 				break;
 			case ODS::HdaFunctionType::VALUE_LIST_CONDITION:
-				query = BuildCmdValueListConditions(pCommand, itr->second);
-				if (!query.empty()) {
-					queries.push_back(query);
-				}
+				pair = std::make_pair<int, std::vector<std::string> >(int(ODS::HdaFunctionType::VALUE_LIST_CONDITION), BuildCmdValueListConditions(startUtc, endUtc, itr->second));
 				break;
 			case ODS::HdaFunctionType::LAST_VALUE:
-				query = BuildCmdLastValue(pCommand, itr->second);
-				if (!query.empty()) {
-					queries.push_back(query);
-				}
+				pair = std::make_pair<int, std::vector<std::string> >(int(ODS::HdaFunctionType::LAST_VALUE), BuildCmdLastValue(startUtc, endUtc, itr->second));
 				break;
 			case ODS::HdaFunctionType::FIRST_VALUE:
-				query = BuildCmdFirstValue(pCommand, itr->second);
-				if (!query.empty()) {
-					queries.push_back(query);
-				}
+				pair = std::make_pair<int, std::vector<std::string> >(int(ODS::HdaFunctionType::FIRST_VALUE), BuildCmdFirstValue(startUtc, endUtc, itr->second));
 				break;
 			case ODS::HdaFunctionType::TIMESTAMP_OF_LAST_VALUE:
-				query = BuildCmdTimeStampLastValue(pCommand, itr->second);
-				if (!query.empty()) {
-					queries.push_back(query);
-				}
+				pair = std::make_pair<int, std::vector<std::string> >(int(ODS::HdaFunctionType::TIMESTAMP_OF_LAST_VALUE), BuildCmdTimeStampLastValue(startUtc, endUtc, itr->second));
 				break;
 			case ODS::HdaFunctionType::TIMESTAMP_OF_FIRST_VALUE:
-				query = BuildCmdTimeStampFirstValue(pCommand, itr->second);
-				if (!query.empty()) {
-					queries.push_back(query);
-				}
+				pair = std::make_pair<int, std::vector<std::string> >(int(ODS::HdaFunctionType::TIMESTAMP_OF_FIRST_VALUE), BuildCmdTimeStampFirstValue(startUtc, endUtc, itr->second));
 				break;
 			case ODS::HdaFunctionType::AVG_VALUE:
-				query = BuildCmdAvgValue(pCommand, itr->second);
-				if (!query.empty()) {
-					queries.push_back(query);
-				}
+				pair = std::make_pair<int, std::vector<std::string> >(int(ODS::HdaFunctionType::AVG_VALUE), BuildCmdAvgValue(startUtc, endUtc, itr->second));
 				break;
 			case ODS::HdaFunctionType::SUM_VALUE:
-				query = BuildCmdSumValue(pCommand, itr->second);
-				if (!query.empty()) {
-					queries.push_back(query);
-				}
+				pair = std::make_pair<int, std::vector<std::string> >(int(ODS::HdaFunctionType::SUM_VALUE), BuildCmdSumValue(startUtc, endUtc, itr->second));
 				break;
 			case ODS::HdaFunctionType::MIN_VALUE:
-				query = BuildCmdMinValue(pCommand, itr->second);
-				if (!query.empty()) {
-					queries.push_back(query);
-				}
+				pair = std::make_pair<int, std::vector<std::string> >(int(ODS::HdaFunctionType::MIN_VALUE), BuildCmdMinValue(startUtc, endUtc, itr->second));
 				break;
 			case ODS::HdaFunctionType::MAX_VALUE:
-				query = BuildCmdMaxValue(pCommand, itr->second);
-				if (!query.empty()) {
-					queries.push_back(query);
-				}
+				pair = std::make_pair<int, std::vector<std::string> >(int(ODS::HdaFunctionType::MAX_VALUE), BuildCmdMaxValue(startUtc, endUtc, itr->second));
 				break;
 			case ODS::HdaFunctionType::TIMESTAMP_OF_MINIMUM_VALUE:
-				query = BuildCmdTimeStampMinValue(pCommand, itr->second);
-				if (!query.empty()) {
-					queries.push_back(query);
-				}
+				pair = std::make_pair<int, std::vector<std::string> >(int(ODS::HdaFunctionType::TIMESTAMP_OF_MINIMUM_VALUE), BuildCmdTimeStampMinValue(startUtc, endUtc, itr->second));
 				break;
 			case ODS::HdaFunctionType::TIMESTAMP_OF_MAXIMUM_VALUE:
-				query = BuildCmdTimeStampMaxValue(pCommand, itr->second);
-				if (!query.empty()) {
-					queries.push_back(query);
-				}
+				pair = std::make_pair<int, std::vector<std::string> >(int(ODS::HdaFunctionType::TIMESTAMP_OF_MAXIMUM_VALUE), BuildCmdTimeStampMaxValue(startUtc, endUtc, itr->second));
 				break;
 			default:
 				break;
 			}
+			insertedPair = queriesList.insert(pair);
 		}
 		
-
+		
 		return ODS::ERR::OK;
 	}
 	else {
@@ -221,76 +195,124 @@ int DrvFTSQLHdaItem::HdaCommandHandler::HandleCloseSession(ODS::HdaFunction* pFu
 	return ODS::ERR::OK;
 }
 
-std::string DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdValueList(const ODS::HdaCommand* pCommand, const std::vector<ODS::HdaFunction*>& rFuncList)
+std::vector<std::string> DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdValueList(const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, const std::vector<ODS::HdaFunction*>& rFuncList)
 {
-	ODS::HdaCommandHelper ch((ODS::HdaCommand*)pCommand);
-	SYSTEMTIME currTime;
-	SYSTEMTIME start;
-	SYSTEMTIME end;
-	ch.GetTimePeriod(&start, &end, &currTime);
-	SYSTEMTIME startUtc, endUtc;
-	ODS::TimeUtils::SysTimeLocalToUtc(start, &startUtc);
-	ODS::TimeUtils::SysTimeLocalToUtc(end, &endUtc);
-
+	std::vector<std::string> vec;
 	for (std::vector<ODS::HdaFunction*>::const_iterator itr = rFuncList.cbegin(); itr != rFuncList.cend(); ++itr) {
-
+		ParamValueList paramList = GetParameterValueList(*itr);
+		vec.push_back(m_database->CreateStatementValueList(std::move(paramList),startTime, endTime));
 	}
-	return std::string();
+	return vec;
 }
 
-std::string DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdValueListConditions(const ODS::HdaCommand* pCommand, const std::vector<ODS::HdaFunction*>& rFuncList)
+std::vector<std::string> DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdValueListConditions(const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, const std::vector<ODS::HdaFunction*>& rFuncList)
 {
-	return std::string();
+	std::vector<std::string> vec;
+	for (std::vector<ODS::HdaFunction*>::const_iterator itr = rFuncList.cbegin(); itr != rFuncList.cend(); ++itr) {
+		ParamValueList paramList = GetParameterValueList(*itr);
+		vec.push_back(m_database->CreateStatementConditionValueList(std::move(paramList), startTime, endTime));
+	}
+	return vec;
 }
 
-std::string DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdFirstValue(const ODS::HdaCommand* pCommand, const std::vector<ODS::HdaFunction*>& rFuncList)
+std::vector<std::string> DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdFirstValue(const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, const std::vector<ODS::HdaFunction*>& rFuncList)
 {
-	return std::string();
+	std::vector<std::string> vec;
+	for (std::vector<ODS::HdaFunction*>::const_iterator itr = rFuncList.cbegin(); itr != rFuncList.cend(); ++itr) {
+		ParamValueList paramList = GetParameterValueList(*itr);
+		vec.push_back(m_database->CreateStatementFirstValue(std::move(paramList), startTime, endTime));
+	}
+	return vec;
 }
 
-std::string DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdLastValue(const ODS::HdaCommand* pCommand, const std::vector<ODS::HdaFunction*>& rFuncList)
+std::vector<std::string> DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdLastValue(const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, const std::vector<ODS::HdaFunction*>& rFuncList)
 {
-	return std::string();
+	std::vector<std::string> vec;
+	for (std::vector<ODS::HdaFunction*>::const_iterator itr = rFuncList.cbegin(); itr != rFuncList.cend(); ++itr) {
+		ParamValueList paramList = GetParameterValueList(*itr);
+		vec.push_back(m_database->CreateStatementLastValue(std::move(paramList), startTime, endTime));
+	}
+	return vec;
 }
 
-std::string DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdMinValue(const ODS::HdaCommand* pCommand, const std::vector<ODS::HdaFunction*>& rFuncList)
+std::vector<std::string> DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdMinValue(const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, const std::vector<ODS::HdaFunction*>& rFuncList)
 {
-	return std::string();
+	std::vector<std::string> vec;
+	for (std::vector<ODS::HdaFunction*>::const_iterator itr = rFuncList.cbegin(); itr != rFuncList.cend(); ++itr) {
+		ParamValueList paramList = GetParameterValueList(*itr);
+		vec.push_back(m_database->CreateStatementLastValue(std::move(paramList), startTime, endTime));
+	}
+	return vec;
 }
 
-std::string DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdMaxValue(const ODS::HdaCommand* pCommand, const std::vector<ODS::HdaFunction*>& rFuncList)
+std::vector<std::string> DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdMaxValue(const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, const std::vector<ODS::HdaFunction*>& rFuncList)
 {
-	return std::string();
+	std::vector<std::string> vec;
+	for (std::vector<ODS::HdaFunction*>::const_iterator itr = rFuncList.cbegin(); itr != rFuncList.cend(); ++itr) {
+		ParamValueList paramList = GetParameterValueList(*itr);
+		vec.push_back(m_database->CreateStatementMaxValue(std::move(paramList), startTime, endTime));
+	}
+	return vec;
 }
 
-std::string DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdSumValue(const ODS::HdaCommand* pCommand, const std::vector<ODS::HdaFunction*>& rFuncList)
+std::vector<std::string> DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdSumValue(const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, const std::vector<ODS::HdaFunction*>& rFuncList)
 {
-	return std::string();
+	std::vector<std::string> vec;
+	for (std::vector<ODS::HdaFunction*>::const_iterator itr = rFuncList.cbegin(); itr != rFuncList.cend(); ++itr) {
+		ParamValueList paramList = GetParameterValueList(*itr);
+		vec.push_back(m_database->CreateStatementSumValue(std::move(paramList), startTime, endTime));
+	}
+	return vec;
 }
 
-std::string DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdAvgValue(const ODS::HdaCommand* pCommand, const std::vector<ODS::HdaFunction*>& rFuncList)
+std::vector<std::string> DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdAvgValue(const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, const std::vector<ODS::HdaFunction*>& rFuncList)
 {
-	return std::string();
+	std::vector<std::string> vec;
+	for (std::vector<ODS::HdaFunction*>::const_iterator itr = rFuncList.cbegin(); itr != rFuncList.cend(); ++itr) {
+		ParamValueList paramList = GetParameterValueList(*itr);
+		vec.push_back(m_database->CreateStatementAvgValue(std::move(paramList), startTime, endTime));
+	}
+	return vec;
 }
 
-std::string DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdTimeStampFirstValue(const ODS::HdaCommand* pCommand, const std::vector<ODS::HdaFunction*>& rFuncList)
+std::vector<std::string> DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdTimeStampFirstValue(const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, const std::vector<ODS::HdaFunction*>& rFuncList)
 {
-	return std::string();
+	std::vector<std::string> vec;
+	for (std::vector<ODS::HdaFunction*>::const_iterator itr = rFuncList.cbegin(); itr != rFuncList.cend(); ++itr) {
+		ParamValueList paramList = GetParameterValueList(*itr);
+		vec.push_back(m_database->CreateStatementTimeStampFirstValue(std::move(paramList), startTime, endTime));
+	}
+	return vec;
 }
 
-std::string DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdTimeStampLastValue(const ODS::HdaCommand* pCommand, const std::vector<ODS::HdaFunction*>& rFuncList)
+std::vector<std::string> DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdTimeStampLastValue(const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, const std::vector<ODS::HdaFunction*>& rFuncList)
 {
-	return std::string();
+	std::vector<std::string> vec;
+	for (std::vector<ODS::HdaFunction*>::const_iterator itr = rFuncList.cbegin(); itr != rFuncList.cend(); ++itr) {
+		ParamValueList paramList = GetParameterValueList(*itr);
+		vec.push_back(m_database->CreateStatementTimeStampLastValue(std::move(paramList), startTime, endTime));
+	}
+	return vec;
 }
 
-std::string DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdTimeStampMaxValue(const ODS::HdaCommand* pCommand, const std::vector<ODS::HdaFunction*>& rFuncList)
+std::vector<std::string> DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdTimeStampMaxValue(const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, const std::vector<ODS::HdaFunction*>& rFuncList)
 {
-	return std::string();
+	std::vector<std::string> vec;
+	for (std::vector<ODS::HdaFunction*>::const_iterator itr = rFuncList.cbegin(); itr != rFuncList.cend(); ++itr) {
+		ParamValueList paramList = GetParameterValueList(*itr);
+		vec.push_back(m_database->CreateStatementTimeStampMaxValue(std::move(paramList), startTime, endTime));
+	}
+	return vec;
 }
 
-std::string DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdTimeStampMinValue(const ODS::HdaCommand* pCommand, const std::vector<ODS::HdaFunction*>& rFuncList)
+std::vector<std::string> DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdTimeStampMinValue(const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, const std::vector<ODS::HdaFunction*>& rFuncList)
 {
-	return std::string();
+	std::vector<std::string> vec;
+	for (std::vector<ODS::HdaFunction*>::const_iterator itr = rFuncList.cbegin(); itr != rFuncList.cend(); ++itr) {
+		ParamValueList paramList = GetParameterValueList(*itr);
+		vec.push_back(m_database->CreateStatementTimeStampMinValue(std::move(paramList), startTime, endTime));
+	}
+	return vec;
 }
 
 DrvFTSQLHdaItem::ParamValueList DrvFTSQLHdaItem::HdaCommandHandler::GetParameterValueList(const ODS::HdaFunction* pHdaFunc)
