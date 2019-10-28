@@ -5,6 +5,9 @@ namespace DrvFTSQLHdaItem
 {
 	class TagItemRecord {
 	public:
+		static const int DATA_TYPE_NUMERIC = 1;
+		static const int DATA_TYPE_DIGITAL = 2;
+		static const int DATA_TYPE_STRING = 3;
 		TagItemRecord();
 		TagItemRecord(const std::string& tagName, short tagId, short tagType, short tagDataType);
 		~TagItemRecord();

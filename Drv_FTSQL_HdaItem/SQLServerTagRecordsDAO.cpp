@@ -48,14 +48,14 @@ std::unique_ptr<DrvFTSQLHdaItem::SQLTable> DrvFTSQLHdaItem::SQLServerTagRecordsD
 }
 
 
-std::map<std::string, DrvFTSQLHdaItem::TagItemRecord> DrvFTSQLHdaItem::SQLServerTagRecordsDAO::GetTags()
+std::map<std::string, DrvFTSQLHdaItem::TagItemRecord> DrvFTSQLHdaItem::SQLServerTagRecordsDAO::GetTags(const std::string& sessionId)
 {
 	std::map<std::string, TagItemRecord> tags;
-	std::string key = OpenConnection();
-	if (key.empty()) {
+	std::map<std::string, std::unique_ptr<IDatabaseEngine> >::iterator itr = m_dataConnectionsList.find(sessionId);
+	if (itr == m_dataConnectionsList.end()) {
 		return tags;
 	}
-	std::unique_ptr<SQLTable> table = GetTableInfo(key, m_tagTableName);
+	std::unique_ptr<SQLTable> table = GetTableInfo(sessionId, m_tagTableName);
 	std::string sql = std::string("SELECT ");
 	for (SQLTable::const_iterator itr = table->cbegin(); itr != table->cend(); ++itr) {
 		sql += std::string(" ") + table->GetFullName() + std::string(".") + itr->first + std::string(", ");
@@ -65,10 +65,6 @@ std::map<std::string, DrvFTSQLHdaItem::TagItemRecord> DrvFTSQLHdaItem::SQLServer
 	Log::GetInstance()->WriteInfo(_T("All Tag SQL Query : % s ."), (LPCTSTR)sql.c_str());
 	std::vector<Record> records;
 	std::vector<std::string> params = { };
-	std::map<std::string, std::unique_ptr<IDatabaseEngine> >::iterator itr = m_dataConnectionsList.find(key);
-	if (itr == m_dataConnectionsList.end()) {
-		return tags;
-	}
 	records = itr->second->ExecuteStatement(sql, params);
 	for (std::vector<Record>::const_iterator itr = records.cbegin(); itr != records.cend(); ++itr) {
 		Record::const_iterator recordItrTagName = itr->findColumnValue(TAG_TABLE_COLUMN_TAG_NAME);
@@ -83,9 +79,9 @@ std::map<std::string, DrvFTSQLHdaItem::TagItemRecord> DrvFTSQLHdaItem::SQLServer
 			tags.insert(pair);
 		}
 	}
-	CloseConnectionWithUUID(key);
 	return tags;
 }
+
 
 std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::OpenConnection()
 {
@@ -106,6 +102,9 @@ std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::OpenConnection()
 
 bool DrvFTSQLHdaItem::SQLServerTagRecordsDAO::OpenConnectionWithUUID(const std::string& connectionID)
 {
+	if (connectionID.empty()) {
+		return false;
+	}
 	m_dataConnectionsList.insert(std::make_pair<std::string, std::unique_ptr<IDatabaseEngine> >(std::string(connectionID), std::make_unique<SQLServerDatabaseEngine>()));
 	if (!m_dataConnectionsList[connectionID]->CreateDirectConnectionToDatabase(m_attributes)) {
 		Log::GetInstance()->WriteInfo(_T("Can't connect to database"));
@@ -127,13 +126,18 @@ void DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CloseConnectionWithUUID(const std:
 	}
 }
 
-std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementValueList(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime)
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementValueList(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short dataType)
 {
+	
 	/*SELECT FloatTable.Val, DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndTime) AS 'DateTime' FROM FloatTable INNER JOIN TagTable ON FloatTable.TagIndex = TagTable.TagIndex  
 	WHERE TagTable.TagName = '[PLC_CP]PT3_1013.Val' AND DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndTime) > DATEADD(day,-2, '2019-05-29') AND
 DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndTime) < (SELECT MIN(DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndTime)) 
 FROM FloatTable WHERE DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndTime) > '2019-06-16') ORDER BY FloatTable.DateAndTime DESC OFFSET 50 ROWS FETCH NEXT 25 ROWS ONLY*/
-	std::string date = std::string("DATEADD(millisecond,") + std::string("%s.") + std::string(TAG_TABLE_COLUMN_MILLITM) + std::string(",%s.") + std::string(TAG_TABLE_COLUMN_DATE_TIME) + std::string(")");
+	std::string tableName = GetTableNameFromDataType(dataType);
+	if (tableName.empty()) {
+		return tableName;
+	}
+	std::string date = std::string(" DATEADD(millisecond,") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_MILLITM) + std::string(",") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_DATE_TIME) + std::string(")");
 	std::string startDate = std::to_string(startTime.wYear) + std::string("-") + std::to_string(startTime.wMonth) + std::string("-") +
 		std::to_string(startTime.wDay) + std::string(" ") + std::to_string(startTime.wHour) + std::string(":") +
 		std::to_string(startTime.wMinute) + std::string(":") + std::to_string(startTime.wSecond);
@@ -141,8 +145,8 @@ FROM FloatTable WHERE DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndT
 		std::to_string(endTime.wDay) + std::string(" ") + std::to_string(endTime.wHour) + std::string(":") +
 		std::to_string(endTime.wMinute) + std::string(":") + std::to_string(endTime.wSecond);
 
-	std::string query = std::string("SELECT ") + std::string("%s") + std::string(".") + std::string(TAG_TABLE_COLUMN_VALUE) + date + std::string(" AS ") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) +
-		std::string("FROM %s INNER JOIN ") + std::string(TAG_TABLE_NAME) + std::string("ON %s.") + std::string(TAG_TABLE_COLUMN_TAG_INDEX) + std::string(" = ") + std::string(TAG_TABLE_NAME) + std::string(".") + 
+	std::string query = std::string("SELECT ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_VALUE) + date + std::string(" AS ") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) +
+		std::string(" FROM ") + tableName + std::string(" INNER JOIN ") + std::string(TAG_TABLE_NAME) + std::string(" ON ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_TAG_INDEX) + std::string(" = ") + std::string(TAG_TABLE_NAME) + std::string(".") +
 		std::string(TAG_TABLE_COLUMN_TAG_INDEX) + std::string(" WHERE ") + std::string(TAG_TABLE_NAME) + std::string(".") + std::string(TAG_TABLE_COLUMN_TAG_NAME) + std::string(" = ") +
 		std::string("'") + param.GetAddress() + std::string("' ");
 	std::string startTimeCondition = date + std::string(" > ");
@@ -159,67 +163,111 @@ FROM FloatTable WHERE DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndT
 	else {
 		endTimeCondition = date + std::string(" < ") + std::string(" '") + endDate + std::string("' ");
 	}
-	if (param.GetLimit().IsLimit()) {
-		std::string limitCondition = std::string(" ASC ");
-		if (param.GetLimit().m_nLimitSide) {
-			limitCondition = std::string(" DESC ");
-		}
+	query = query + std::string(" AND ") + startTimeCondition + std::string(" AND ") + endTimeCondition;
+	if (param.HasSql()) {
+		query = query + std::string(" ") + param.GetSqc();
 	}
+	std::string limitCondition = std::string(" ORDER BY ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_DATE_TIME);
+	if (param.GetLimit().IsLimit()) {
+		if (param.GetLimit().m_nLimitSide) {
+			limitCondition = limitCondition + std::string(" DESC ");
+		}
+		else {
+			limitCondition = limitCondition + std::string(" ASC ");
+		}
+		limitCondition = limitCondition + std::string("OFFSET ") + std::to_string(param.GetLimit().m_nLimitOffset) + std::string(" ROWS FETCH NEXT ") +
+			std::to_string(param.GetLimit().m_nLimitCount) + std::string(" ROWS ONLY");
+	}
+	query = query + limitCondition;
 	return query;
 }
 
-std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementConditionValueList(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime)
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementConditionValueList(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short dataType)
 {
 	return std::string();
 }
 
-std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementLastValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime)
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementLastValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short dataType)
 {
 	return std::string();
 }
 
-std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementFirstValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime)
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementFirstValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short dataType)
 {
 	return std::string();
 }
 
-std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementMinValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime)
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementMinValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short dataType)
 {
 	return std::string();
 }
 
-std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementMaxValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime)
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementMaxValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short dataType)
 {
 	return std::string();
 }
 
-std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementSumValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime)
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementSumValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short dataType)
 {
 	return std::string();
 }
 
-std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementAvgValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime)
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementAvgValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short dataType)
 {
 	return std::string();
 }
 
-std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementTimeStampFirstValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime)
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementTimeStampFirstValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short dataType)
 {
 	return std::string();
 }
 
-std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementTimeStampLastValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime)
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementTimeStampLastValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short dataType)
 {
 	return std::string();
 }
 
-std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementTimeStampMaxValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime)
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementTimeStampMaxValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short dataType)
 {
 	return std::string();
 }
 
-std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementTimeStampMinValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime)
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementTimeStampMinValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short dataType)
 {
 	return std::string();
 }
 
+std::vector<DrvFTSQLHdaItem::Record> DrvFTSQLHdaItem::SQLServerTagRecordsDAO::GetRecords(const std::string& statement, const std::string& connectionID)
+{
+	std::vector<Record> records;
+	std::vector<std::string> params = { };
+	std::map<std::string, std::unique_ptr<IDatabaseEngine> >::iterator itr = m_dataConnectionsList.find(connectionID);
+	if (itr == m_dataConnectionsList.end()) {
+		Log::GetInstance()->WriteInfo(_T("Could not connect to database."));
+		return records;
+	}
+	Log::GetInstance()->WriteInfo(_T("Execute statement: %s ...."), (LPCTSTR)statement.c_str());
+	records = itr->second->ExecuteStatement(statement, params);
+	if (records.empty()) {
+		Log::GetInstance()->WriteInfo(_T("There are no any tags with this conditions"));
+		return records;
+	}
+	Log::GetInstance()->WriteInfo(_T("Number of recordss: %d"), records.size());
+	return records;
+}
+
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::GetTableNameFromDataType(short dataType)
+{
+	switch (dataType) {
+	case TagItemRecord::DATA_TYPE_NUMERIC:
+		return std::string(TAG_FLOAT_VALUE_TABLE_NAME);
+		break;
+	case TagItemRecord::DATA_TYPE_DIGITAL:
+	case TagItemRecord::DATA_TYPE_STRING:
+		return std::string(TAG_STRING_VALUE_TABLE_NAME);
+		break;
+	default:
+		return std::string();
+		break;
+	}
+}

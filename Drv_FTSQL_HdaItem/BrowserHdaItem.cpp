@@ -164,7 +164,12 @@ int DrvFTSQLHdaItem::BrowserHdaItem::DestroyBrowseItemList(ODS::BrowseItem* pLis
 int DrvFTSQLHdaItem::BrowserHdaItem::GetTagList(std::vector<ODS::OdsString>& rEntry, std::vector<STagItem>* pTagList)
 {
 	pTagList->clear();
-	std::map<std::string, TagItemRecord> tags = m_database->GetTags();
+	std::string key = m_database->OpenConnection();
+	if (key.empty()) {
+		return ODS::ERR::DB_CONNECTION_FAILED;
+	}
+	std::map<std::string, TagItemRecord> tags = m_database->GetTags(key);
+	m_database->CloseConnectionWithUUID(key);
 	for (std::map<std::string, TagItemRecord>::const_iterator itr = tags.cbegin(); itr != tags.cend(); ++itr) {
 		STagItem item;
 		item.m_vAddress.push_back(ODS::OdsString(itr->second.GetTegName().c_str())); 
