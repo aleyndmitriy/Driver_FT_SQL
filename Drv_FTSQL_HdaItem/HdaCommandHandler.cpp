@@ -3,6 +3,7 @@
 #include<OdsErr.h>
 #include<OdsCoreLib/HdaCommandHelper.h>
 #include<OdsCoreLib/HdaFunctionHelper.h>
+#include <OdsCoreLib/HdaFunctionResultHelper.h>
 #include<HdaFunction.h>
 #include <HdaFunctionResult.h>
 #include<HdaFunctionTypes.h>
@@ -67,6 +68,7 @@ int DrvFTSQLHdaItem::HdaCommandHandler::ExecuteCommand(const ODS::HdaCommand* pC
 		ODS::HdaCommandHelper hdaCmdHelper((ODS::HdaCommand*)pCommand);
 		ODS::Core::Uuid sessionId;
 		hdaCmdHelper.GetSessionId(&sessionId);
+		
 		SYSTEMTIME currTime;
 		SYSTEMTIME start;
 		SYSTEMTIME end;
@@ -75,10 +77,23 @@ int DrvFTSQLHdaItem::HdaCommandHandler::ExecuteCommand(const ODS::HdaCommand* pC
 		ODS::TimeUtils::SysTimeLocalToUtc(start, &startUtc);
 		ODS::TimeUtils::SysTimeLocalToUtc(end, &endUtc);
 		std::map<int, std::vector<std::string> > queriesList;
-		std::string sessionID = std::string(sessionId.ToString().GetString());
+		std::string sessionID;
+		if (sessionId.IsEmpty()) {
+			sessionID = m_database->OpenConnection();
+			if (sessionID.empty()) {
+				return ODS::ERR::DB_CONNECTION_FAILED;
+			}
+		}
+		else {
+			sessionID = std::string(sessionId.ToString().GetString());
+		}
 		CreateQueriesList(requestMap, queriesList, startUtc, endUtc, sessionID);
 		if (queriesList.empty()) {
 			return ODS::ERR::DB_NO_DATA;
+		}
+		ExecuteQueriesList(requestMap, queriesList, pResultList, sessionID);
+		if (sessionId.IsEmpty()) {
+			m_database->CloseConnectionWithUUID(sessionID);
 		}
 		return ODS::ERR::OK;
 	}
@@ -159,7 +174,6 @@ std::vector<std::string> DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdValueList(c
 		ParamValueList paramList = GetParameterValueList(*itr);
 		std::map<std::string, TagItemRecord >::const_iterator tagItr = tags.find(paramList.GetAddress());
 		if (tagItr != tags.cend()) {
-
 			vec.push_back(m_database->CreateStatementValueList(std::move(paramList), startTime, endTime, tagItr->second.GetTagDataType()));
 		}
 	}
@@ -361,6 +375,42 @@ void DrvFTSQLHdaItem::HdaCommandHandler::CreateQueriesList(const std::map<int, s
 			break;
 		}
 		insertedPair = queriesList.insert(pair);
+	}
+}
+
+void DrvFTSQLHdaItem::HdaCommandHandler::ExecuteQueriesList(const std::map<int, std::vector<ODS::HdaFunction*> >& requestFunctions, const std::map<int, std::vector<std::string> >& queriesList, std::vector<ODS::HdaFunctionResult*>* pResultList, const std::string& sessionId)
+{
+	for (std::map<int, std::vector<std::string> >::const_iterator queriesIterator = queriesList.cbegin(); queriesIterator != queriesList.cend(); ++queriesIterator) {
+		size_t length = queriesIterator->second.size();
+		for (size_t index = 0; index < length; ++index) {
+			std::vector<Record> vec = m_database->GetRecords(queriesIterator->second.at(index), sessionId);
+			std::vector<ODS::Tvq> tvqList;
+			for (std::vector<Record>::const_iterator recordsIterator = vec.cbegin(); recordsIterator != vec.cend(); ++recordsIterator) {
+				tvqList.push_back(CreateTvqFromRecord(*recordsIterator));
+			}
+			if (tvqList.empty()) {
+				continue;
+			}
+			std::map<int, std::vector<ODS::HdaFunction*> >::const_iterator funcIterator = requestFunctions.find(queriesIterator->first);
+			if (funcIterator != requestFunctions.cend() && index < funcIterator->second.size()) {
+				ODS::HdaFunctionResult* pGeneralFuncResult = nullptr;
+				if (funcIterator->first == ODS::HdaFunctionType::VALUE_LIST_CONDITION) {
+					ODS::HdaFunctionResultVLC* pFuncResult = new ODS::HdaFunctionResultVLC;
+					pFuncResult->SetContext(funcIterator->second.at(index)->GetContext());
+					ODS::HdaFRVLCHelper h(pFuncResult);
+					h.SetTvqList(tvqList);
+					pGeneralFuncResult = pFuncResult;
+				}
+				else {
+					ODS::HdaFunctionResultValueList* pFuncResult = new ODS::HdaFunctionResultValueList;
+					pFuncResult->SetContext(funcIterator->second.at(index)->GetContext());
+					ODS::HdaFRVLHelper h(pFuncResult);
+					h.SetTvqList(tvqList);
+					pGeneralFuncResult = pFuncResult;
+				}
+				pResultList->push_back(pGeneralFuncResult);
+			}	
+		}
 	}
 }
 

@@ -38,5 +38,6 @@ namespace DrvFTSQLHdaItem
 		ParamValueList GetParameterValueList(const ODS::HdaFunction* pHdaFunc);
 		ODS::Tvq CreateTvqFromRecord(const Record& record) const;
 		void CreateQueriesList(const std::map<int, std::vector<ODS::HdaFunction*> >& requestFunctions, std::map<int, std::vector<std::string> >& queriesList, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, const std::string& sessionId);
+		void ExecuteQueriesList(const std::map<int, std::vector<ODS::HdaFunction*> >& requestFunctions, const std::map<int, std::vector<std::string> >& queriesList, std::vector<ODS::HdaFunctionResult*>* pResultList, const std::string& sessionId);
 	};
 }

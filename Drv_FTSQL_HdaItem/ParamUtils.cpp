@@ -5,7 +5,7 @@
 #include <AddressComponent.h>
 #include <AddressHelper.h>
 #include <Address.h>
-//#include <AddressComponentHelper.h>
+#include <AddressComponentHelper.h>
 #include <OdsErr.h>
 
 
@@ -25,11 +25,11 @@
 			std::vector<ODS::AddressComponent> al;
 			ah.GetAddress(&al, 0);
 
-			/*if (al.size() > 0)
+			if (al.size() > 0)
 			{
 				ODS::AddressComponentHelper ach1(&al[al.size() - 1]);
 				rAddress = ach1.GetValue();
-			}*/
+			}
 		}
 
 		void GetAddress(const ODS::OdsString& rPlainAddress, ODS::OdsString& rAddress)
@@ -41,11 +41,11 @@
 			std::vector<ODS::AddressComponent> al;
 			ah.GetAddress(&al, 0);
 
-			/*if (al.size() > 0)
+			if (al.size() > 0)
 			{
 				ODS::AddressComponentHelper ach1(&al[al.size() - 1]);
 				rAddress = ach1.GetValue();
-			}*/
+			}
 		}
 
 		ODS::OdsString GetSql(const ODS::HdaFunctionParam* pParam)
