@@ -44,7 +44,7 @@ int DrvFTSQLHdaItem::ServerHdaItem::IsHdaFunctionSupported(int nFuncType)
 	case ODS::HdaFunctionType::SUM_VALUE:
 	case ODS::HdaFunctionType::MIN_VALUE:
 	case ODS::HdaFunctionType::MAX_VALUE:
-	case ODS::HdaFunctionType::TIMESTAMP_OF_MINIMUM_VALUE:
+	case ODS::HdaFunctionType::TIMESTAMP_OF_MINIMUM_VALUE: 
 	case ODS::HdaFunctionType::TIMESTAMP_OF_MAXIMUM_VALUE:
 	case ODS::HdaFunctionType::OPEN_SESSION:
 	case ODS::HdaFunctionType::CLOSE_SESSION:
@@ -75,6 +75,7 @@ int DrvFTSQLHdaItem::ServerHdaItem::Execute(ODS::HdaCommand* pCommand, ODS::HdaC
 
 int DrvFTSQLHdaItem::ServerHdaItem::DestroyResult(ODS::HdaCommandResult* pResult)
 {
+	
 	delete pResult;
 	return ODS::ERR::OK;
 }

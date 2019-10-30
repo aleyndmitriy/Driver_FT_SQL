@@ -44,18 +44,22 @@ DrvFTSQLHdaItem::ConnectionAttributes DrvFTSQLHdaItem::HdaCommandHandler::GetCon
 int DrvFTSQLHdaItem::HdaCommandHandler::HandleCommand(ODS::HdaCommand* pCommand, ODS::HdaCommandResult* pResult)
 {
 	std::vector<ODS::HdaFunctionResult*> resultList;
-	ExecuteCommand(pCommand, &resultList);
+	ODS::HdaFunction** pList = nullptr;
+	int nCount = 0;
+	int iRes = pCommand->GetFunctionList(&pList, &nCount);
+	ExecuteCommand(pCommand, *pList, nCount, &resultList);
 	for (std::vector<ODS::HdaFunctionResult*>::const_iterator iterRes = resultList.cbegin(); iterRes != resultList.cend(); iterRes++)
 	{
 		pResult->AddFunctionResult(*iterRes);
 	}
+	pCommand->DestroyFunctionList(pList, nCount);
 	return ODS::ERR::OK;
 }
 
-int DrvFTSQLHdaItem::HdaCommandHandler::ExecuteCommand(const ODS::HdaCommand* pCommand, std::vector<ODS::HdaFunctionResult*>* pResultList)
+int DrvFTSQLHdaItem::HdaCommandHandler::ExecuteCommand(ODS::HdaCommand* pCommand, ODS::HdaFunction* funcList, int listSize, std::vector<ODS::HdaFunctionResult*>* pResultList)
 {
 	std::map<int,std::vector<ODS::HdaFunction*> > requestMap;
-	int res = AnalyzeCommand(pCommand, requestMap);
+	int res = AnalyzeCommand(pCommand, funcList, listSize, requestMap);
 	if (res == ODS::ERR::OK) {
 		std::map<int, std::vector<ODS::HdaFunction*> >::const_iterator itr = requestMap.find(ODS::HdaFunctionType::OPEN_SESSION);
 		if (itr != requestMap.cend() && itr->second.size() == 1) {
@@ -102,13 +106,13 @@ int DrvFTSQLHdaItem::HdaCommandHandler::ExecuteCommand(const ODS::HdaCommand* pC
 	}
 }
 
-int DrvFTSQLHdaItem::HdaCommandHandler::AnalyzeCommand(const ODS::HdaCommand* pCommand, std::map<int, std::vector<ODS::HdaFunction*> >& requestMap)
+int DrvFTSQLHdaItem::HdaCommandHandler::AnalyzeCommand(ODS::HdaCommand* pCommand, ODS::HdaFunction* list, int listSize, std::map<int, std::vector<ODS::HdaFunction*> >& requestMap)
 {
 	requestMap.clear();
-	ODS::HdaCommand* pCmd = const_cast<ODS::HdaCommand*>(pCommand);
-	ODS::HdaCommandHelper ch(pCmd);
 	std::vector<ODS::HdaFunction*> funcList;
-	ch.GetFunctionList(&funcList);
+	for (int i = 0; i < listSize; i++) {
+		funcList.push_back(list + i);
+	}
 	if (funcList.size() <= 0) {
 		return ODS::ERR::NOT_SUPPORTED;
 	}
@@ -131,7 +135,6 @@ int DrvFTSQLHdaItem::HdaCommandHandler::AnalyzeCommand(const ODS::HdaCommand* pC
 
 int DrvFTSQLHdaItem::HdaCommandHandler::HandleOpenSession(ODS::HdaFunction* pFunc, std::vector<ODS::HdaFunctionResult*>* pResultList)
 {
-	ODS::HdaCommandResult* pRes = new ODS::HdaCommandResult;
 	ODS::HdaFunctionResultSession* pSession = new ODS::HdaFunctionResultSession;
 	pSession->SetContext(pFunc->GetContext());
 	ODS::Core::Uuid sessionId;
@@ -159,7 +162,6 @@ int DrvFTSQLHdaItem::HdaCommandHandler::HandleCloseSession(ODS::HdaFunction* pFu
 	std::string uuid = std::string(sessionId.ToString().GetString());
 	m_database->CloseConnectionWithUUID(uuid);
 	Log::GetInstance()->WriteInfoDebug(_T("CloseSession ok,  session id %s"), (LPCTSTR)sessionId.ToString());
-	ODS::HdaCommandResult* pRes = new ODS::HdaCommandResult;
 	ODS::HdaFunctionResultSession* pSession = new ODS::HdaFunctionResultSession;
 	pSession->SetContext(pFunc->GetContext());
 	pSession->SetRc(ODS::ERR::OK);
@@ -384,47 +386,52 @@ void DrvFTSQLHdaItem::HdaCommandHandler::ExecuteQueriesList(const std::map<int, 
 		size_t length = queriesIterator->second.size();
 		for (size_t index = 0; index < length; ++index) {
 			std::vector<Record> vec = m_database->GetRecords(queriesIterator->second.at(index), sessionId);
-			std::vector<ODS::Tvq> tvqList;
-			for (std::vector<Record>::const_iterator recordsIterator = vec.cbegin(); recordsIterator != vec.cend(); ++recordsIterator) {
-				tvqList.push_back(CreateTvqFromRecord(*recordsIterator));
-			}
-			if (tvqList.empty()) {
+			if (vec.empty()) {
 				continue;
 			}
 			std::map<int, std::vector<ODS::HdaFunction*> >::const_iterator funcIterator = requestFunctions.find(queriesIterator->first);
 			if (funcIterator != requestFunctions.cend() && index < funcIterator->second.size()) {
-				ODS::HdaFunctionResult* pGeneralFuncResult = nullptr;
 				if (funcIterator->first == ODS::HdaFunctionType::VALUE_LIST_CONDITION) {
 					ODS::HdaFunctionResultVLC* pFuncResult = new ODS::HdaFunctionResultVLC;
 					pFuncResult->SetContext(funcIterator->second.at(index)->GetContext());
-					ODS::HdaFRVLCHelper h(pFuncResult);
-					h.SetTvqList(tvqList);
-					pGeneralFuncResult = pFuncResult;
+					for (std::vector<Record>::const_iterator itr = vec.cbegin(); itr != vec.cend(); ++itr) {
+						pFuncResult->AddTvq(CreateTvqFromRecord(*itr));
+					}
+					pResultList->push_back(pFuncResult);
 				}
 				else {
 					ODS::HdaFunctionResultValueList* pFuncResult = new ODS::HdaFunctionResultValueList;
 					pFuncResult->SetContext(funcIterator->second.at(index)->GetContext());
-					ODS::HdaFRVLHelper h(pFuncResult);
-					h.SetTvqList(tvqList);
-					pGeneralFuncResult = pFuncResult;
+					for (std::vector<Record>::const_iterator itr = vec.cbegin(); itr != vec.cend(); ++itr) {
+						pFuncResult->AddTvq(CreateTvqFromRecord(*itr));
+					}
+					pResultList->push_back(pFuncResult);
 				}
-				pResultList->push_back(pGeneralFuncResult);
-			}	
+				
+			}
 		}
 	}
 }
 
 DrvFTSQLHdaItem::ParamValueList DrvFTSQLHdaItem::HdaCommandHandler::GetParameterValueList(const ODS::HdaFunction* pHdaFunc)
 {
-	ODS::HdaFunctionHelper fh((ODS::HdaFunction*)pHdaFunc);
+	
 	std::vector<ODS::HdaFunctionParam*> paramList;
-	fh.GetParameterList(&paramList);
+	ODS::HdaFunctionParam** pParam = nullptr;
+	int nCount = 0;
+	int res = pHdaFunc->GetParameterList(&pParam, &nCount);
+	for (int i = 0; i < nCount; i++) {
+		paramList.push_back(pParam[i]);
+	}
 	ODS::OdsString address;
 	ODS::OdsString fullAddress;
 	ODS::OdsString sql;
 	bool prevPoint = false;
 	bool postPoint = false;
 	ODS::HdaFunctionParamLimit::LimitParam limit;
+	limit.m_nLimitCount = 0;
+	limit.m_nLimitOffset = 0;
+	limit.m_nLimitSide = 0;
 	int nSpecPoint = 0;
 	int valueType = 0;
 	for (std::vector<ODS::HdaFunctionParam*>::const_iterator itr = paramList.cbegin(); itr != paramList.cend(); ++itr) {
@@ -464,10 +471,9 @@ DrvFTSQLHdaItem::ParamValueList DrvFTSQLHdaItem::HdaCommandHandler::GetParameter
 	return ParamValueList(std::string(address.GetString()), std::string(fullAddress.GetString()), std::string(sql.GetString()), prevPoint, postPoint, valueType,Limit(limit.m_nLimitSide,limit.m_nLimitOffset,limit.m_nLimitCount));
 }
 
-ODS::Tvq DrvFTSQLHdaItem::HdaCommandHandler::CreateTvqFromRecord(const Record& record) const
+ODS::Tvq* DrvFTSQLHdaItem::HdaCommandHandler::CreateTvqFromRecord(const Record& record) const
 {
 	VARIANT vValue;
-	ODS::Data::Value value;
 	std::string str;
 	const TIMESTAMP_STRUCT* timeStampStruct = nullptr;
 	SYSTEMTIME dataTime = { 0 };
@@ -475,7 +481,7 @@ ODS::Tvq DrvFTSQLHdaItem::HdaCommandHandler::CreateTvqFromRecord(const Record& r
 	SYSTEMTIME localDataTime = { 0 };
 	float val = 0.0;
 	std::string miliStr;
-	ODS::Tvq tvq;
+	ODS::Tvq* tvq = new ODS::Tvq;
 	for (Record::const_iterator itr = record.cbegin(); itr != record.cend(); ++itr) {
 		switch (itr->second.first)
 		{
@@ -483,7 +489,7 @@ ODS::Tvq DrvFTSQLHdaItem::HdaCommandHandler::CreateTvqFromRecord(const Record& r
 			::VariantInit(&vValue);
 			vValue.vt = VT_R8;
 			vValue.dblVal = std::stod(itr->second.second);
-			tvq.SetValue(vValue);
+			tvq->SetValue(vValue);
 			::VariantClear(&vValue);
 			break;
 		case SQL_C_FLOAT:
@@ -491,11 +497,11 @@ ODS::Tvq DrvFTSQLHdaItem::HdaCommandHandler::CreateTvqFromRecord(const Record& r
 			vValue.vt = VT_R8;
 			val = std::stof(itr->second.second);
 			vValue.dblVal = val;
-			tvq.SetValue(vValue);
+			tvq->SetValue(vValue);
 			::VariantClear(&vValue);
 			break;
 		case SQL_C_CHAR:
-			tvq.SetValue(ODS::Data::Value(itr->second.second.c_str()));
+			tvq->SetValue(ODS::Data::Value(itr->second.second.c_str()));
 			break;
 		case SQL_C_TYPE_TIMESTAMP:
 			timeStampStruct = reinterpret_cast<const TIMESTAMP_STRUCT*>(itr->second.second .c_str());
@@ -512,13 +518,13 @@ ODS::Tvq DrvFTSQLHdaItem::HdaCommandHandler::CreateTvqFromRecord(const Record& r
 			dataTime.wMilliseconds = std::stoul(miliStr);
 			//ODS::OdbcLib::ConvertTimestampStructToSysTime(dataTime, &utcDataTime);
 			ODS::TimeUtils::SysTimeUtcToLocal(dataTime, &localDataTime);
-			tvq.SetTimestamp(&localDataTime);
+			tvq->SetTimestamp(&localDataTime);
 			break;
 		default:
 			break;
 		}
 	}
-	tvq.SetQuality(ODS::Tvq::QUALITY_GOOD);
+	tvq->SetQuality(ODS::Tvq::QUALITY_GOOD);
 	return tvq;
 	
 }

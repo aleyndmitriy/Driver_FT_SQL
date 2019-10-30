@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "DSource.h"
 #include "PluginObjectFactory.h"
-
+#include"Log.h"
 DrvFTSQLHdaItem::CDSource::CDSource() : m_Configurator([this]()->ODS::UI::IAbstractUIFacrory* {
 	if (m_pHost)
 		return (ODS::UI::IAbstractUIFacrory*) (m_pHost->GetInterface(ODS::IPluginHost::IID_UI_FACTORY));
@@ -42,6 +42,10 @@ DrvFTSQLHdaItem::CDSource::CDSource() : m_Configurator([this]()->ODS::UI::IAbstr
 			return ODS::ERR::BAD_PARAM;
 
 		m_pHost = const_cast<ODS::IPluginHost*>(pHost);
+		ODS::System::ILog* pILog =
+			static_cast<ODS::System::ILog*>(m_pHost->GetInterface(ODS::IPluginHost::IID_LOG));
+
+		DrvFTSQLHdaItem::Log::GetInstance()->Init(pILog);
 		return ODS::ERR::OK;
 	}
 

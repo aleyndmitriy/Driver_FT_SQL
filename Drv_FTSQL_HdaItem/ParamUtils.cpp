@@ -18,12 +18,18 @@
 
 			ODS::ItemAddress ia;
 			pIap->GetItemAddress(&ia);
+			ODS::AddressComponent* addrComp = nullptr;
+			int nCount = 0;
+			int nIndex = 0;
 			ODS::AddressHelper ah(&ia);
 
 			rFullAddress = ah.GetPlainAddress();
 
 			std::vector<ODS::AddressComponent> al;
-			ah.GetAddress(&al, 0);
+			ia.GetAddress(&addrComp, &nCount, &nIndex);
+			for (int index = 0; index < nCount; index++) {
+				al.push_back(addrComp[index]);
+			}
 
 			if (al.size() > 0)
 			{
