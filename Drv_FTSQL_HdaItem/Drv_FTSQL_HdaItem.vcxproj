@@ -201,6 +201,7 @@
     <ClCompile Include="DSource.cpp" />
     <ClCompile Include="Export.cpp" />
     <ClCompile Include="HdaCommandHandler.cpp" />
+    <ClCompile Include="HdaFunctionResultValueList.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="ParamUtils.cpp" />
     <ClCompile Include="ParamValue.cpp" />
@@ -245,6 +246,7 @@
     <ClInclude Include="Export.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="HdaCommandHandler.h" />
+    <ClInclude Include="HdaFunctionResultValueList.h" />
     <ClInclude Include="IEnvironment.h" />
     <ClInclude Include="ISettingsDataSource.h" />
     <ClInclude Include="Log.h" />

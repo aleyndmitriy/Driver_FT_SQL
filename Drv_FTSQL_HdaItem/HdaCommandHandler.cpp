@@ -382,6 +382,7 @@ void DrvFTSQLHdaItem::HdaCommandHandler::CreateQueriesList(const std::map<int, s
 
 void DrvFTSQLHdaItem::HdaCommandHandler::ExecuteQueriesList(const std::map<int, std::vector<ODS::HdaFunction*> >& requestFunctions, const std::map<int, std::vector<std::string> >& queriesList, std::vector<ODS::HdaFunctionResult*>* pResultList, const std::string& sessionId)
 {
+	
 	for (std::map<int, std::vector<std::string> >::const_iterator queriesIterator = queriesList.cbegin(); queriesIterator != queriesList.cend(); ++queriesIterator) {
 		size_t length = queriesIterator->second.size();
 		for (size_t index = 0; index < length; ++index) {
@@ -395,7 +396,7 @@ void DrvFTSQLHdaItem::HdaCommandHandler::ExecuteQueriesList(const std::map<int, 
 					ODS::HdaFunctionResultVLC* pFuncResult = new ODS::HdaFunctionResultVLC;
 					pFuncResult->SetContext(funcIterator->second.at(index)->GetContext());
 					for (std::vector<Record>::const_iterator itr = vec.cbegin(); itr != vec.cend(); ++itr) {
-						pFuncResult->AddTvq(CreateTvqFromRecord(*itr));
+						pFuncResult->AddTvq(new ODS::Tvq(CreateTvqFromRecord(*itr)));
 					}
 					pResultList->push_back(pFuncResult);
 				}
@@ -403,11 +404,10 @@ void DrvFTSQLHdaItem::HdaCommandHandler::ExecuteQueriesList(const std::map<int, 
 					ODS::HdaFunctionResultValueList* pFuncResult = new ODS::HdaFunctionResultValueList;
 					pFuncResult->SetContext(funcIterator->second.at(index)->GetContext());
 					for (std::vector<Record>::const_iterator itr = vec.cbegin(); itr != vec.cend(); ++itr) {
-						pFuncResult->AddTvq(CreateTvqFromRecord(*itr));
+						pFuncResult->AddTvq(new ODS::Tvq(CreateTvqFromRecord(*itr)));
 					}
 					pResultList->push_back(pFuncResult);
 				}
-				
 			}
 		}
 	}
@@ -471,7 +471,7 @@ DrvFTSQLHdaItem::ParamValueList DrvFTSQLHdaItem::HdaCommandHandler::GetParameter
 	return ParamValueList(std::string(address.GetString()), std::string(fullAddress.GetString()), std::string(sql.GetString()), prevPoint, postPoint, valueType,Limit(limit.m_nLimitSide,limit.m_nLimitOffset,limit.m_nLimitCount));
 }
 
-ODS::Tvq* DrvFTSQLHdaItem::HdaCommandHandler::CreateTvqFromRecord(const Record& record) const
+ODS::Tvq DrvFTSQLHdaItem::HdaCommandHandler::CreateTvqFromRecord(const Record& record) const
 {
 	VARIANT vValue;
 	std::string str;
@@ -481,7 +481,7 @@ ODS::Tvq* DrvFTSQLHdaItem::HdaCommandHandler::CreateTvqFromRecord(const Record& 
 	SYSTEMTIME localDataTime = { 0 };
 	float val = 0.0;
 	std::string miliStr;
-	ODS::Tvq* tvq = new ODS::Tvq;
+	ODS::Tvq tvq;
 	for (Record::const_iterator itr = record.cbegin(); itr != record.cend(); ++itr) {
 		switch (itr->second.first)
 		{
@@ -489,7 +489,7 @@ ODS::Tvq* DrvFTSQLHdaItem::HdaCommandHandler::CreateTvqFromRecord(const Record& 
 			::VariantInit(&vValue);
 			vValue.vt = VT_R8;
 			vValue.dblVal = std::stod(itr->second.second);
-			tvq->SetValue(vValue);
+			tvq.SetValue(vValue);
 			::VariantClear(&vValue);
 			break;
 		case SQL_C_FLOAT:
@@ -497,11 +497,11 @@ ODS::Tvq* DrvFTSQLHdaItem::HdaCommandHandler::CreateTvqFromRecord(const Record& 
 			vValue.vt = VT_R8;
 			val = std::stof(itr->second.second);
 			vValue.dblVal = val;
-			tvq->SetValue(vValue);
+			tvq.SetValue(vValue);
 			::VariantClear(&vValue);
 			break;
 		case SQL_C_CHAR:
-			tvq->SetValue(ODS::Data::Value(itr->second.second.c_str()));
+			tvq.SetValue(ODS::Data::Value(itr->second.second.c_str()));
 			break;
 		case SQL_C_TYPE_TIMESTAMP:
 			timeStampStruct = reinterpret_cast<const TIMESTAMP_STRUCT*>(itr->second.second .c_str());
@@ -518,13 +518,13 @@ ODS::Tvq* DrvFTSQLHdaItem::HdaCommandHandler::CreateTvqFromRecord(const Record& 
 			dataTime.wMilliseconds = std::stoul(miliStr);
 			//ODS::OdbcLib::ConvertTimestampStructToSysTime(dataTime, &utcDataTime);
 			ODS::TimeUtils::SysTimeUtcToLocal(dataTime, &localDataTime);
-			tvq->SetTimestamp(&localDataTime);
+			tvq.SetTimestamp(&localDataTime);
 			break;
 		default:
 			break;
 		}
 	}
-	tvq->SetQuality(ODS::Tvq::QUALITY_GOOD);
+	tvq.SetQuality(ODS::Tvq::QUALITY_GOOD);
 	return tvq;
 	
 }
