@@ -75,6 +75,6 @@ int DrvFTSQLHdaItem::ServerHdaItem::Execute(ODS::HdaCommand* pCommand, ODS::HdaC
 
 int DrvFTSQLHdaItem::ServerHdaItem::DestroyResult(ODS::HdaCommandResult* pResult)
 {
-	//delete pResult; Need to discuss;
+	delete pResult;
 	return ODS::ERR::OK;
 }

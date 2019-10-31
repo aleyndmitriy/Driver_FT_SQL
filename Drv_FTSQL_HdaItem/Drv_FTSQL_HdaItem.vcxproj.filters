@@ -180,9 +180,6 @@
     <ClCompile Include="ParamUtils.cpp">
       <Filter>Исходные файлы\Server</Filter>
     </ClCompile>
-    <ClCompile Include="HdaFunctionResultValueList.cpp">
-      <Filter>Исходные файлы\Server</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Drv_FTSQL_HdaItem.def">
@@ -299,9 +296,6 @@
       <Filter>Файлы заголовков\DataAccessLayer\Tables</Filter>
     </ClInclude>
     <ClInclude Include="ParamUtils.h">
-      <Filter>Файлы заголовков\Server</Filter>
-    </ClInclude>
-    <ClInclude Include="HdaFunctionResultValueList.h">
       <Filter>Файлы заголовков\Server</Filter>
     </ClInclude>
   </ItemGroup>

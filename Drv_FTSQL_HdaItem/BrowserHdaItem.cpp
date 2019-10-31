@@ -4,7 +4,6 @@
 #include <OdsErr.h>
 #include <AddressComponent.h>
 #include <Address.h>
-#include<AddressHelper.h>
 #include"XMLSettingsDataSource.h"
 
 
@@ -41,18 +40,31 @@ int DrvFTSQLHdaItem::BrowserHdaItem::Shut()
 
 ODS::OdsString DrvFTSQLHdaItem::BrowserHdaItem::GetAddressOld(const ODS::ItemAddress& rAddress)
 {
-	ODS::AddressHelper ah(&rAddress);
-
+	ODS::AddressComponent* addrComp = nullptr;
+	int nCount = 0;
 	int nIndex = 0;
-	std::vector<std::pair<ODS::OdsString, ODS::OdsString>> listAddrCmp;
-	ah.GetAddressAsList(&listAddrCmp, &nIndex);
-
-	for (size_t i = 0; i < listAddrCmp.size(); i++)
-	{
-		if (listAddrCmp[i].first == _T("address_old"))
-			return listAddrCmp[i].second;
+	rAddress.GetAddress(&addrComp, &nCount, &nIndex);
+	if (addrComp != nullptr) {
+		for (int ind = 0; ind < nCount; ++ind) {
+			TCHAR* name = nullptr;
+			addrComp[ind].GetValue(&name);
+			if (name != nullptr) {
+				ODS::OdsString strName = ODS::OdsString(name);
+				addrComp[ind].DestroyString(name);
+				if (strName == _T("address_old")) {
+					TCHAR* address = nullptr;
+					if (address != nullptr) {
+						ODS::OdsString strAddress = ODS::OdsString(address);
+						addrComp[ind].DestroyString(address);
+						rAddress.DestroyAddress(addrComp, nCount);
+						return strAddress;
+					}
+					
+				}
+			}
+		}
+		rAddress.DestroyAddress(addrComp, nCount);
 	}
-
 	return _T("");
 }
 

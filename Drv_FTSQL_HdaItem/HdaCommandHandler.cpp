@@ -1,13 +1,11 @@
 #include"pch.h"
 #include"HdaCommandHandler.h"
 #include<OdsErr.h>
-#include<OdsCoreLib/HdaCommandHelper.h>
-#include<OdsCoreLib/HdaFunctionHelper.h>
-#include <OdsCoreLib/HdaFunctionResultHelper.h>
 #include<HdaFunction.h>
 #include <HdaFunctionResult.h>
 #include<HdaFunctionTypes.h>
 #include <HdaFunctionParam.h>
+#include <HdaCommandParam.h>
 #include"Constants.h"
 #include"Log.h"
 #include"ParamUtils.h"
@@ -69,14 +67,35 @@ int DrvFTSQLHdaItem::HdaCommandHandler::ExecuteCommand(ODS::HdaCommand* pCommand
 		if (itr != requestMap.cend() && itr->second.size() == 1) {
 			return HandleCloseSession(itr->second[0], pResultList);
 		}
-		ODS::HdaCommandHelper hdaCmdHelper((ODS::HdaCommand*)pCommand);
+		ODS::HdaCommandParam** ppCmdParamList = NULL;
+		int nCount = 0;
+		int iRes = pCommand->GetParamList(&ppCmdParamList, &nCount);
 		ODS::Core::Uuid sessionId;
-		hdaCmdHelper.GetSessionId(&sessionId);
-		
 		SYSTEMTIME currTime;
 		SYSTEMTIME start;
 		SYSTEMTIME end;
-		hdaCmdHelper.GetTimePeriod(&start, &end, &currTime);
+		if (iRes == ODS::ERR::OK)
+		{
+			for (int i = 0; i < nCount; i++)
+			{
+				if (ppCmdParamList[i]->GetType() == ODS::HdaCommandParam::TYPE_TIME_PERIOD)
+				{
+					ODS::HdaCommandParamTimePeriod* pTimePeriod = (ODS::HdaCommandParamTimePeriod*)ppCmdParamList[i];
+
+					if (ODS::ERR::OK != pTimePeriod->GetTimePeriod(&start, &end, &currTime))
+					{
+						pCommand->DestroyParamList(ppCmdParamList, nCount);
+						return ODS::ERR::BAD_PARAM;
+					}
+				}
+				if (ppCmdParamList[i]->GetType() == ODS::HdaCommandParam::TYPE_SESSION)
+				{
+					ODS::HdaCommandParamSession* pSession = (ODS::HdaCommandParamSession*)ppCmdParamList[i];
+					sessionId = pSession->GetSessionId();
+				}
+			}
+			pCommand->DestroyParamList(ppCmdParamList, nCount);
+		}
 		SYSTEMTIME startUtc, endUtc;
 		ODS::TimeUtils::SysTimeLocalToUtc(start, &startUtc);
 		ODS::TimeUtils::SysTimeLocalToUtc(end, &endUtc);
@@ -156,9 +175,25 @@ int DrvFTSQLHdaItem::HdaCommandHandler::HandleOpenSession(ODS::HdaFunction* pFun
 
 int DrvFTSQLHdaItem::HdaCommandHandler::HandleCloseSession(ODS::HdaFunction* pFunc, std::vector<ODS::HdaFunctionResult*>* pResultList)
 {
-	ODS::HdaFunctionHelper fh(pFunc);
+	ODS::HdaFunctionParam** pParam = nullptr;
+	int nCount = 0;
+	int res = pFunc->GetParameterList(&pParam, &nCount);
 	ODS::Core::Uuid sessionId;
-	fh.GetParamSessionId(&sessionId);
+	if (pParam != nullptr && nCount > 0) {
+		for (int ind = 0; ind < nCount; ind++) {
+			if ((*pParam + ind)->GetType() == ODS::HdaFunctionParam::TYPE_SESSION) {
+				ODS::HdaFunctionParamSession* ptrParamSession = dynamic_cast<ODS::HdaFunctionParamSession*>(*pParam + ind);
+				if (ptrParamSession != nullptr) {
+					sessionId = ptrParamSession->GetSessionId();
+				}
+				break;
+			}
+		}
+	}
+	else {
+		return ODS::ERR::BAD_PARAM;
+	}
+	pFunc->DestroyParameterList(pParam, nCount);
 	std::string uuid = std::string(sessionId.ToString().GetString());
 	m_database->CloseConnectionWithUUID(uuid);
 	Log::GetInstance()->WriteInfoDebug(_T("CloseSession ok,  session id %s"), (LPCTSTR)sessionId.ToString());
@@ -467,7 +502,7 @@ DrvFTSQLHdaItem::ParamValueList DrvFTSQLHdaItem::HdaCommandHandler::GetParameter
 			break;
 		}
 	}
-
+	pHdaFunc->DestroyParameterList(pParam, nCount);
 	return ParamValueList(std::string(address.GetString()), std::string(fullAddress.GetString()), std::string(sql.GetString()), prevPoint, postPoint, valueType,Limit(limit.m_nLimitSide,limit.m_nLimitOffset,limit.m_nLimitCount));
 }
 
