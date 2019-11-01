@@ -5,7 +5,7 @@
 #include <AddressComponent.h>
 #include <Address.h>
 #include"XMLSettingsDataSource.h"
-
+#include"Log.h"
 
 DrvFTSQLHdaItem::BrowserHdaItem::BrowserHdaItem():m_database(nullptr),m_attributes(),m_TagList()
 {
@@ -111,6 +111,7 @@ int DrvFTSQLHdaItem::BrowserHdaItem::GetBrowseItemList(const ODS::ItemAddress* p
 				pAddrComponent[ind].DestroyString(szName);
 				pAddrComponent[ind].DestroyString(szValue);
 			}
+			pAddr->DestroyAddress(pAddrComponent, nCount);
 		}
 
 		iRes = GetTagList(entry, &tagList);
@@ -121,7 +122,7 @@ int DrvFTSQLHdaItem::BrowserHdaItem::GetBrowseItemList(const ODS::ItemAddress* p
 
 		if (*pulCount)
 		{
-			*ppList = new ODS::BrowseItem[*pulCount];
+			*ppList =  new ODS::BrowseItem[*pulCount];
 			if (*ppList)
 			{
 				for (UINT ind = 0; ind < tagList.size(); ind++)
@@ -161,7 +162,6 @@ int DrvFTSQLHdaItem::BrowserHdaItem::GetBrowseItemList(const ODS::ItemAddress* p
 	}
 
 	return iRes;
-	return ODS::ERR::OK;
 }
 
 int DrvFTSQLHdaItem::BrowserHdaItem::DestroyBrowseItemList(ODS::BrowseItem* pList, ULONG ulCount)
@@ -180,15 +180,31 @@ int DrvFTSQLHdaItem::BrowserHdaItem::GetTagList(std::vector<ODS::OdsString>& rEn
 	if (key.empty()) {
 		return ODS::ERR::DB_CONNECTION_FAILED;
 	}
-	std::map<std::string, TagItemRecord> tags = m_database->GetTags(key);
-	m_database->CloseConnectionWithUUID(key);
-	for (std::map<std::string, TagItemRecord>::const_iterator itr = tags.cbegin(); itr != tags.cend(); ++itr) {
-		STagItem item;
-		item.m_vAddress.push_back(ODS::OdsString(itr->second.GetTegName().c_str())); 
-		item.m_szDescription = ODS::OdsString(itr->second.GetTegName().c_str());
-		pTagList->push_back(item);
+	std::vector<std::string> tagsName;
+	for (std::vector<ODS::OdsString>::const_iterator itr = rEntry.cbegin(); itr != rEntry.cend(); ++itr) {
+		tagsName.push_back(itr->GetString());
 	}
-
-	return ODS::ERR::OK;
+	std::map<std::string, TagItemRecord> tags = m_database->GetTags(key, tagsName);
+	m_database->CloseConnectionWithUUID(key);
+	if (tagsName.empty()) {
+		for (std::map<std::string, TagItemRecord>::const_iterator itr = tags.cbegin(); itr != tags.cend(); ++itr) {
+			STagItem item;
+			item.m_vAddress.push_back(ODS::OdsString(itr->second.GetTegName().c_str()));
+			item.m_szDescription = ODS::OdsString(itr->second.GetTegName().c_str());
+			pTagList->push_back(item);
+		}
+		return ODS::ERR::OK;
+	}
+	else {
+		for (std::vector<std::string>::const_iterator itr = tagsName.cbegin(); itr != tagsName.cend(); ++itr) {
+			std::map<std::string, TagItemRecord >::const_iterator tagsItr = tags.find(*itr);
+			if (tagsItr == tags.cend()) {
+				Log::GetInstance()->WriteInfo(_T("There is now tag with name: %s ...."), (LPCTSTR)itr->c_str());
+				return ODS::ERR::DB_NO_DATA;
+			}
+		}
+		return ODS::ERR::OK;
+	}
+	
 }
 

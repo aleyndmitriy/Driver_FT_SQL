@@ -364,7 +364,7 @@ std::vector<std::string> DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdTimeStampMi
 void DrvFTSQLHdaItem::HdaCommandHandler::CreateQueriesList(const std::map<int, std::vector<ODS::HdaFunction*> >& requestFunctions, std::map<int, std::vector<std::string> >& queriesList, const SYSTEMTIME& startUtc, const SYSTEMTIME& endUtc, const std::string& sessionId)
 {
 	queriesList.clear();
-	std::map<std::string, TagItemRecord> tags = m_database->GetTags(sessionId);
+	std::map<std::string, TagItemRecord> tags = m_database->GetTags(sessionId,std::vector<std::string>());
 	if (tags.empty()) {
 		return;
 	}
@@ -503,7 +503,8 @@ DrvFTSQLHdaItem::ParamValueList DrvFTSQLHdaItem::HdaCommandHandler::GetParameter
 		}
 	}
 	pHdaFunc->DestroyParameterList(pParam, nCount);
-	return ParamValueList(std::string(address.GetString()), std::string(fullAddress.GetString()), std::string(sql.GetString()), prevPoint, postPoint, valueType,Limit(limit.m_nLimitSide,limit.m_nLimitOffset,limit.m_nLimitCount));
+	ParamValueList valList(std::string(address.GetString()), std::string(fullAddress.GetString()), std::string(sql.GetString()), prevPoint, postPoint, valueType, Limit(limit.m_nLimitSide, limit.m_nLimitOffset, limit.m_nLimitCount));
+	return valList;
 }
 
 ODS::Tvq DrvFTSQLHdaItem::HdaCommandHandler::CreateTvqFromRecord(const Record& record) const

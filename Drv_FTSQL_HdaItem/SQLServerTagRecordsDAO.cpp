@@ -48,7 +48,7 @@ std::unique_ptr<DrvFTSQLHdaItem::SQLTable> DrvFTSQLHdaItem::SQLServerTagRecordsD
 }
 
 
-std::map<std::string, DrvFTSQLHdaItem::TagItemRecord> DrvFTSQLHdaItem::SQLServerTagRecordsDAO::GetTags(const std::string& sessionId)
+std::map<std::string, DrvFTSQLHdaItem::TagItemRecord> DrvFTSQLHdaItem::SQLServerTagRecordsDAO::GetTags(const std::string& sessionId, const std::vector<std::string>& tagsName)
 {
 	std::map<std::string, TagItemRecord> tags;
 	std::map<std::string, std::unique_ptr<IDatabaseEngine> >::iterator itr = m_dataConnectionsList.find(sessionId);
@@ -62,10 +62,18 @@ std::map<std::string, DrvFTSQLHdaItem::TagItemRecord> DrvFTSQLHdaItem::SQLServer
 	}
 	sql.erase(sql.size() - 2, 2);
 	sql += std::string(" FROM ") + table->GetFullName();
+	if (!tagsName.empty()) {
+		sql += std::string(" WHERE ");
+	}
+	for (std::vector<std::string>::const_iterator itr = tagsName.cbegin(); itr != tagsName.cend(); ++itr) {
+		sql = sql + m_tagTableName + std::string(".") + std::string(TAG_TABLE_COLUMN_TAG_NAME) + std::string(" = '") + *itr + std::string("' OR ");
+	}
+	if (!tagsName.empty()) {
+		sql.erase(sql.size() - 4, 4);
+	}
 	Log::GetInstance()->WriteInfo(_T("All Tag SQL Query : % s ."), (LPCTSTR)sql.c_str());
 	std::vector<Record> records;
-	std::vector<std::string> params = { };
-	records = itr->second->ExecuteStatement(sql, params);
+	records = itr->second->ExecuteStatement(sql, std::vector<std::string>());
 	for (std::vector<Record>::const_iterator itr = records.cbegin(); itr != records.cend(); ++itr) {
 		Record::const_iterator recordItrTagName = itr->findColumnValue(TAG_TABLE_COLUMN_TAG_NAME);
 		Record::const_iterator recordItrTagIndex = itr->findColumnValue(TAG_TABLE_COLUMN_TAG_INDEX);
