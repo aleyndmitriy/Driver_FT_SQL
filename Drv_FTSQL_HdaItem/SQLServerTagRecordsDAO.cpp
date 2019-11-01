@@ -134,14 +134,19 @@ void DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CloseConnectionWithUUID(const std:
 	}
 }
 
-std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementValueList(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short dataType)
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementValueList(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, const std::map<std::string, TagItemRecord>& tags)
 {
 	
 	/*SELECT FloatTable.Val, DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndTime) AS 'DateTime' FROM FloatTable INNER JOIN TagTable ON FloatTable.TagIndex = TagTable.TagIndex  
 	WHERE TagTable.TagName = '[PLC_CP]PT3_1013.Val' AND DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndTime) > DATEADD(day,-2, '2019-05-29') AND
 DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndTime) < (SELECT MIN(DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndTime)) 
 FROM FloatTable WHERE DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndTime) > '2019-06-16') ORDER BY FloatTable.DateAndTime DESC OFFSET 50 ROWS FETCH NEXT 25 ROWS ONLY*/
-	std::string tableName = GetTableNameFromDataType(dataType);
+	std::map<std::string, TagItemRecord >::const_iterator tagItr = tags.find(param.GetAddress());
+	if (tagItr == tags.cend()) {
+		return std::string();
+	}
+
+	std::string tableName = GetTableNameFromDataType(tagItr->second.GetTagDataType());
 	if (tableName.empty()) {
 		return tableName;
 	}
@@ -190,12 +195,12 @@ FROM FloatTable WHERE DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndT
 	return query;
 }
 
-std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementConditionValueList(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short dataType)
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementConditionValueList(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, const std::map<std::string, TagItemRecord>& tags)
 {
-	return CreateStatementValueList(std::move(param), startTime, endTime, dataType);
+	return CreateStatementValueList(std::move(param), startTime, endTime, tags);
 }
 
-std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementLastValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short dataType)
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementLastValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short tagId, short dataType)
 {
 	
 	/*SELECT TOP(1) FloatTable.Val, DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndTime) AS 'DateTime' FROM FloatTable INNER JOIN TagTable ON FloatTable.TagIndex = TagTable.TagIndex
@@ -241,7 +246,7 @@ DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndTime) <=  '2019-06-16' 
 	return query;
 }
 
-std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementFirstValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short dataType)
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementFirstValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short tagId, short dataType)
 {
 	/*SELECT TOP(1) FloatTable.Val, DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndTime) AS 'DateTime' FROM FloatTable INNER JOIN TagTable ON FloatTable.TagIndex = TagTable.TagIndex
 	WHERE TagTable.TagName = '[PLC_CP]ZSL_1011.Sts_Closed' AND DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndTime) > DATEADD(day,-2, '2019-05-29') AND
@@ -286,7 +291,7 @@ std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementFirstValue(P
 	return query;
 }
 
-std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementMinValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short dataType)
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementMinValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short tagId, short dataType)
 {
 	/*SELECT TOP(1) FloatTable.Val, DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndTime) AS 'DateTime' FROM FloatTable INNER JOIN TagTable ON FloatTable.TagIndex = TagTable.TagIndex
 	WHERE TagTable.TagName = '[PLC_CP]ZSL_1011.Sts_Closed' AND DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndTime) > DATEADD(day,-2, '2019-05-29') AND
@@ -332,7 +337,7 @@ std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementMinValue(Par
 	return query;
 }
 
-std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementMaxValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short dataType)
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementMaxValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short tagId, short dataType)
 {
 	/*SELECT TOP(1) FloatTable.Val, DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndTime) AS 'DateTime' FROM FloatTable INNER JOIN TagTable ON FloatTable.TagIndex = TagTable.TagIndex
 	WHERE TagTable.TagName = '[PLC_CP]ZSL_1011.Sts_Closed' AND DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndTime) > DATEADD(day,-2, '2019-05-29') AND
@@ -378,7 +383,7 @@ std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementMaxValue(Par
 	return query;
 }
 
-std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementSumValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short dataType)
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementSumValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short tagId, short dataType)
 {
 	/*SELECT MAX(FloatTable.Val) AS 'FloatVal', '1970-01-01 00:00:00.000' AS 'DateTime' FROM FloatTable INNER JOIN TagTable ON FloatTable.TagIndex = TagTable.TagIndex
 	WHERE TagTable.TagName = '[PLC_CP]ZSL_1011.Sts_Closed' AND DATEADD(millisecond, FloatTable.Millitm, FloatTable.DateAndTime) > DATEADD(day, -2, '2019-05-29') AND
@@ -421,7 +426,7 @@ std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementSumValue(Par
 	return query;
 }
 
-std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementAvgValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short dataType)
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementAvgValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short tagId, short dataType)
 {
 	/*SELECT AVG(FloatTable.Val) AS 'FloatVal', '1970-01-01 00:00:00.000' AS 'DateTime' FROM FloatTable INNER JOIN TagTable ON FloatTable.TagIndex = TagTable.TagIndex
 	WHERE TagTable.TagName = '[PLC_CP]ZSL_1011.Sts_Closed' AND DATEADD(millisecond, FloatTable.Millitm, FloatTable.DateAndTime) > DATEADD(day, -2, '2019-05-29') AND
@@ -464,24 +469,24 @@ std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementAvgValue(Par
 	return query;
 }
 
-std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementTimeStampFirstValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short dataType)
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementTimeStampFirstValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short tagId, short dataType)
 {
-	return CreateStatementFirstValue(std::move(param),startTime,endTime,dataType);
+	return CreateStatementFirstValue(std::move(param),startTime,endTime, tagId, dataType);
 }
 
-std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementTimeStampLastValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short dataType)
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementTimeStampLastValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short tagId, short dataType)
 {
-	return CreateStatementLastValue(std::move(param), startTime, endTime, dataType);
+	return CreateStatementLastValue(std::move(param), startTime, endTime, tagId, dataType);
 }
 
-std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementTimeStampMaxValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short dataType)
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementTimeStampMaxValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short tagId, short dataType)
 {
-	return CreateStatementMaxValue(std::move(param), startTime, endTime, dataType);
+	return CreateStatementMaxValue(std::move(param), startTime, endTime, tagId, dataType);
 }
 
-std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementTimeStampMinValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short dataType)
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementTimeStampMinValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short tagId, short dataType)
 {
-	return CreateStatementMinValue(std::move(param), startTime, endTime, dataType);
+	return CreateStatementMinValue(std::move(param), startTime, endTime, tagId, dataType);
 }
 
 std::vector<DrvFTSQLHdaItem::Record> DrvFTSQLHdaItem::SQLServerTagRecordsDAO::GetRecords(const std::string& statement, const std::string& connectionID)

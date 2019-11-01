@@ -211,7 +211,7 @@ std::vector<std::string> DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdValueList(c
 		ParamValueList paramList = GetParameterValueList(*itr);
 		std::map<std::string, TagItemRecord >::const_iterator tagItr = tags.find(paramList.GetAddress());
 		if (tagItr != tags.cend()) {
-			vec.push_back(m_database->CreateStatementValueList(std::move(paramList), startTime, endTime, tagItr->second.GetTagDataType()));
+			vec.push_back(m_database->CreateStatementValueList(std::move(paramList), startTime, endTime, tags));
 		}
 	}
 	return vec;
@@ -224,7 +224,7 @@ std::vector<std::string> DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdValueListCo
 		ParamValueList paramList = GetParameterValueList(*itr);
 		std::map<std::string, TagItemRecord >::const_iterator tagItr = tags.find(paramList.GetAddress());
 		if (tagItr != tags.cend()) {
-			vec.push_back(m_database->CreateStatementConditionValueList(std::move(paramList), startTime, endTime, tagItr->second.GetTagDataType()));
+			vec.push_back(m_database->CreateStatementConditionValueList(std::move(paramList), startTime, endTime, tags));
 		}
 	}
 	return vec;
@@ -237,7 +237,7 @@ std::vector<std::string> DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdFirstValue(
 		ParamValueList paramList = GetParameterValueList(*itr);
 		std::map<std::string, TagItemRecord >::const_iterator tagItr = tags.find(paramList.GetAddress());
 		if (tagItr != tags.cend()) {
-			vec.push_back(m_database->CreateStatementFirstValue(std::move(paramList), startTime, endTime, tagItr->second.GetTagDataType()));
+			vec.push_back(m_database->CreateStatementFirstValue(std::move(paramList), startTime, endTime, tagItr->second.GetTagId(), tagItr->second.GetTagDataType()));
 		}
 	}
 	return vec;
@@ -250,7 +250,7 @@ std::vector<std::string> DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdLastValue(c
 		ParamValueList paramList = GetParameterValueList(*itr);
 		std::map<std::string, TagItemRecord >::const_iterator tagItr = tags.find(paramList.GetAddress());
 		if (tagItr != tags.cend()) {
-			vec.push_back(m_database->CreateStatementLastValue(std::move(paramList), startTime, endTime, tagItr->second.GetTagDataType()));
+			vec.push_back(m_database->CreateStatementLastValue(std::move(paramList), startTime, endTime, tagItr->second.GetTagId(), tagItr->second.GetTagDataType()));
 		}
 		
 	}
@@ -264,7 +264,7 @@ std::vector<std::string> DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdMinValue(co
 		ParamValueList paramList = GetParameterValueList(*itr);
 		std::map<std::string, TagItemRecord >::const_iterator tagItr = tags.find(paramList.GetAddress());
 		if (tagItr != tags.cend()) {
-			vec.push_back(m_database->CreateStatementMinValue(std::move(paramList), startTime, endTime, tagItr->second.GetTagDataType()));
+			vec.push_back(m_database->CreateStatementMinValue(std::move(paramList), startTime, endTime, tagItr->second.GetTagId(), tagItr->second.GetTagDataType()));
 		}
 	}
 	return vec;
@@ -277,7 +277,7 @@ std::vector<std::string> DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdMaxValue(co
 		ParamValueList paramList = GetParameterValueList(*itr);
 		std::map<std::string, TagItemRecord >::const_iterator tagItr = tags.find(paramList.GetAddress());
 		if (tagItr != tags.cend()) {
-			vec.push_back(m_database->CreateStatementMaxValue(std::move(paramList), startTime, endTime, tagItr->second.GetTagDataType()));
+			vec.push_back(m_database->CreateStatementMaxValue(std::move(paramList), startTime, endTime, tagItr->second.GetTagId(), tagItr->second.GetTagDataType()));
 		}
 	}
 	return vec;
@@ -290,7 +290,7 @@ std::vector<std::string> DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdSumValue(co
 		ParamValueList paramList = GetParameterValueList(*itr);
 		std::map<std::string, TagItemRecord >::const_iterator tagItr = tags.find(paramList.GetAddress());
 		if (tagItr != tags.cend()) {
-			vec.push_back(m_database->CreateStatementSumValue(std::move(paramList), startTime, endTime, tagItr->second.GetTagDataType()));
+			vec.push_back(m_database->CreateStatementSumValue(std::move(paramList), startTime, endTime, tagItr->second.GetTagId(), tagItr->second.GetTagDataType()));
 		}
 	}
 	return vec;
@@ -303,7 +303,7 @@ std::vector<std::string> DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdAvgValue(co
 		ParamValueList paramList = GetParameterValueList(*itr);
 		std::map<std::string, TagItemRecord >::const_iterator tagItr = tags.find(paramList.GetAddress());
 		if (tagItr != tags.cend()) {
-			vec.push_back(m_database->CreateStatementAvgValue(std::move(paramList), startTime, endTime, tagItr->second.GetTagDataType()));
+			vec.push_back(m_database->CreateStatementAvgValue(std::move(paramList), startTime, endTime, tagItr->second.GetTagId(), tagItr->second.GetTagDataType()));
 		}
 	}
 	return vec;
@@ -316,7 +316,7 @@ std::vector<std::string> DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdTimeStampFi
 		ParamValueList paramList = GetParameterValueList(*itr);
 		std::map<std::string, TagItemRecord >::const_iterator tagItr = tags.find(paramList.GetAddress());
 		if (tagItr != tags.cend()) {
-			vec.push_back(m_database->CreateStatementTimeStampFirstValue(std::move(paramList), startTime, endTime, tagItr->second.GetTagDataType()));
+			vec.push_back(m_database->CreateStatementTimeStampFirstValue(std::move(paramList), startTime, endTime, tagItr->second.GetTagId(), tagItr->second.GetTagDataType()));
 		}
 	}
 	return vec;
@@ -329,7 +329,7 @@ std::vector<std::string> DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdTimeStampLa
 		ParamValueList paramList = GetParameterValueList(*itr);
 		std::map<std::string, TagItemRecord >::const_iterator tagItr = tags.find(paramList.GetAddress());
 		if (tagItr != tags.cend()) {
-			vec.push_back(m_database->CreateStatementTimeStampLastValue(std::move(paramList), startTime, endTime, tagItr->second.GetTagDataType()));
+			vec.push_back(m_database->CreateStatementTimeStampLastValue(std::move(paramList), startTime, endTime, tagItr->second.GetTagId(), tagItr->second.GetTagDataType()));
 		}
 	}
 	return vec;
@@ -342,7 +342,7 @@ std::vector<std::string> DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdTimeStampMa
 		ParamValueList paramList = GetParameterValueList(*itr);
 		std::map<std::string, TagItemRecord >::const_iterator tagItr = tags.find(paramList.GetAddress());
 		if (tagItr != tags.cend()) {
-			vec.push_back(m_database->CreateStatementTimeStampMaxValue(std::move(paramList), startTime, endTime, tagItr->second.GetTagDataType()));
+			vec.push_back(m_database->CreateStatementTimeStampMaxValue(std::move(paramList), startTime, endTime, tagItr->second.GetTagId(), tagItr->second.GetTagDataType()));
 		}
 	}
 	return vec;
@@ -355,7 +355,7 @@ std::vector<std::string> DrvFTSQLHdaItem::HdaCommandHandler::BuildCmdTimeStampMi
 		ParamValueList paramList = GetParameterValueList(*itr);
 		std::map<std::string, TagItemRecord >::const_iterator tagItr = tags.find(paramList.GetAddress());
 		if (tagItr != tags.cend()) {
-			vec.push_back(m_database->CreateStatementTimeStampMinValue(std::move(paramList), startTime, endTime, tagItr->second.GetTagDataType()));
+			vec.push_back(m_database->CreateStatementTimeStampMinValue(std::move(paramList), startTime, endTime, tagItr->second.GetTagId(), tagItr->second.GetTagDataType()));
 		}
 	}
 	return vec;
