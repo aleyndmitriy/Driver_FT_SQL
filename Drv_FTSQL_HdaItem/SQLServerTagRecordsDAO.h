@@ -43,5 +43,7 @@ namespace DrvFTSQLHdaItem
 		std::map<std::string, std::unique_ptr<IDatabaseEngine> > m_dataConnectionsList;
 		std::unique_ptr<SQLTable> GetTableInfo(const std::string& connectionID, std::string tableName);
 		std::string GetTableNameFromDataType(short dataType);
+		std::string ParseCondition(const std::string& condition, const std::string& startTime, const std::string& endTime, const std::map<std::string, TagItemRecord>& tags);
+		std::vector<std::pair<std::string, std::string>> GetConditionsFromParam( std::string&& sql);
 	};
 }
