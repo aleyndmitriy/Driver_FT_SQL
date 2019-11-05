@@ -144,78 +144,47 @@ std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementValueList(Pa
 	if (tableName.empty()) {
 		return tableName;
 	}
-	
-	std::string date = std::string("DATEADD(millisecond,") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_MILLITM) + std::string(",") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_DATE_TIME) + std::string(")");
-	
-	std::string startDate = std::to_string(startTime.wYear) + std::string("-") + std::to_string(startTime.wMonth) + std::string("-") +
-		std::to_string(startTime.wDay) + std::string(" ") + std::to_string(startTime.wHour) + std::string(":") +
-		std::to_string(startTime.wMinute) + std::string(":") + std::to_string(startTime.wSecond);
-	
-	std::string startDatePrev = std::string("DATEADD(day, ") + std::string("-") + m_attributes.daysBack + std::string(", '") + startDate + std::string("') ");
-
-	std::string endDate = std::to_string(endTime.wYear) + std::string("-") + std::to_string(endTime.wMonth) + std::string("-") +
-		std::to_string(endTime.wDay) + std::string(" ") + std::to_string(endTime.wHour) + std::string(":") +
-		std::to_string(endTime.wMinute) + std::string(":") + std::to_string(endTime.wSecond);
-	
-		std::string query = std::string("SELECT ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_VALUE) + std::string("  AS '") + std::string(TAG_TABLE_COLUMN_VALUE) + std::string("' , ") + date + std::string(" AS '") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) +
+	std::string date;
+	std::string startDate;
+	std::string startDatePrev;
+	std::string endDate;
+	std::vector <std::pair<std::string, std::string> > conditions;
+	if (param.HasSql()) {
+		conditions = GetConditionsFromParam(param.GetSqc());
+	}
+	CreateDateTimeString(startTime, endTime, tableName, date, startDate, startDatePrev, endDate);
+	std::string query = std::string("SELECT ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_VALUE) + std::string("  AS '") + std::string(TAG_TABLE_COLUMN_VALUE) + std::string("', ") + date + std::string(" AS '") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) +
 		std::string("' FROM ") + tableName + std::string(" WHERE ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_TAG_INDEX) + std::string(" = ") +
 		std::to_string(tagItr->second.GetTagId()) + std::string(" AND ") + date + std::string(" > '") + startDate + std::string("' AND ") + date + std::string(" < '") + endDate + std::string("'");
 	
 	std::string prev;
 	if (param.HasPrevPoint()) {
-		prev = std::string("SELECT TOP(1) ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_VALUE) + std::string("  AS '") + 
-			std::string(TAG_TABLE_COLUMN_VALUE) + std::string("' , ") + date + std::string(" AS '") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) + 
-			std::string("' FROM ") + tableName + std::string(" WHERE ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_TAG_INDEX) + std::string(" = ") +
-			std::to_string(tagItr->second.GetTagId()) + std::string(" AND ") + 
-			date + std::string(" >= DATEADD(day, ") + std::string("-") + m_attributes.daysBack + std::string(", '") + startDate + std::string("') AND ") +
-			date + std::string(" < '") + startDate + std::string("' ORDER BY ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_DATE_TIME) + std::string(" DESC");
+		CreatePrevPointSql(prev, tableName, tagItr->second.GetTagId(),startDate,conditions,tags);
 	}
 	
 	std::string post;
 	if(param.HasPostPoint()) {
-		post = std::string("SELECT TOP(1) ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_VALUE) + std::string("  AS '") + std::string(TAG_TABLE_COLUMN_VALUE) + 
-			std::string("' , ") + date + std::string(" AS '") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) + std::string("' FROM ") + tableName + std::string(" WHERE ") +
-			tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_TAG_INDEX) + std::string(" = ") +
-			std::to_string(tagItr->second.GetTagId()) + std::string(" AND ") + date + std::string(" >= '") + endDate + 
-			std::string("' ORDER BY ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_DATE_TIME) + std::string(" ASC");
+		CreatePostPointSql(post, tableName, tagItr->second.GetTagId(), endDate, conditions, tags);
 	}
 	
-	if (param.HasSql()) {
-		std::vector <std::pair<std::string, std::string> > conditions = GetConditionsFromParam(param.GetSqc());
+	if (!conditions.empty()) {
 		std::string queries;
-		std::string prevQueries;
-		std::string postQueries;
-		if (!conditions.empty()) {
-			for (std::vector <std::pair<std::string, std::string> >::const_iterator itr = conditions.cbegin(); itr != conditions.cend(); ++itr) {
-				queries = queries + ParseCondition(itr->first, std::string("'") + startDate + std::string("'"), std::string("'") + endDate + std::string("'"), tags) + itr->second;
-				if (param.HasPrevPoint()) {
-					prevQueries = prevQueries + ParseCondition(itr->first, startDatePrev, std::string("'") + startDate + std::string("'"), tags) + itr->second;
-				}
-				if(param.HasPostPoint()) {
-					postQueries = postQueries + ParseCondition(itr->first, std::string("'") + endDate + std::string("'"), std::string(), tags) + itr->second;
-				}
-			}
+		for (std::vector <std::pair<std::string, std::string> >::const_iterator itr = conditions.cbegin(); itr != conditions.cend(); ++itr) {
+			queries = queries + ParseCondition(itr->first, std::string("'") + startDate + std::string("'"), std::string("'") + endDate + std::string("'"), tags) + itr->second;
 		}
-		if (param.HasPrevPoint()) {
-			prev = std::string("SELECT PrevTag.") + std::string(TAG_TABLE_COLUMN_VALUE) + std::string(", PrevTag.") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) +
-				std::string(" FROM (") + prev + std::string(") AS PrevTag INNER JOIN (") + prevQueries + (") AS TagPrevConditions ON PrevTag.") +
-				std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) +
-				std::string("= TagPrevConditions.") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) + std::string(" UNION ALL ");
-		}
-		query = prev + std::string("SELECT Tags.") + std::string(TAG_TABLE_COLUMN_VALUE) + std::string(", Tags.") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) +
+		query = std::string("SELECT Tags.") + std::string(TAG_TABLE_COLUMN_VALUE) + std::string(", Tags.") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) +
 			std::string(" FROM (") + query + std::string(") AS Tags INNER JOIN (") + queries + (") AS TagsConditions ON Tags.") +
 			std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) +
 			std::string("= TagsConditions.") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC);
-
-		if (param.HasPostPoint()) {
-			post = std::string(" UNION ALL ") + std::string("SELECT PostTag.") + std::string(TAG_TABLE_COLUMN_VALUE) + std::string(", PostTag.") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) +
-				std::string(" FROM (") + post + std::string(") AS PostTag INNER JOIN (") + postQueries + (") AS TagPostConditions ON PostTag.") +
-				std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) +
-				std::string("= TagPostConditions.") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC);
-			query += post;
-		}
 	}
-
+		
+	if (!prev.empty()) {
+		query = prev + query;
+	}
+	if (!post.empty()) {
+		query += post;
+	}
+	
 	std::string limitCondition = std::string(" ORDER BY ") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC);
 	if (param.GetLimit().IsLimit()) {
 		if (param.GetLimit().m_nLimitSide) {
@@ -242,17 +211,15 @@ std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementConditionVal
 		return tableName;
 	}
 
-	std::string date = std::string("DATEADD(millisecond,") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_MILLITM) + std::string(",") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_DATE_TIME) + std::string(")");
-
-	std::string startDate = std::to_string(startTime.wYear) + std::string("-") + std::to_string(startTime.wMonth) + std::string("-") +
-		std::to_string(startTime.wDay) + std::string(" ") + std::to_string(startTime.wHour) + std::string(":") +
-		std::to_string(startTime.wMinute) + std::string(":") + std::to_string(startTime.wSecond);
-
-	std::string startDatePrev = std::string("DATEADD(day, ") + std::string("-") + m_attributes.daysBack + std::string(", '") + startDate + std::string("') ");
-
-	std::string endDate = std::to_string(endTime.wYear) + std::string("-") + std::to_string(endTime.wMonth) + std::string("-") +
-		std::to_string(endTime.wDay) + std::string(" ") + std::to_string(endTime.wHour) + std::string(":") +
-		std::to_string(endTime.wMinute) + std::string(":") + std::to_string(endTime.wSecond);
+	std::string date;
+	std::string startDate;
+	std::string startDatePrev;
+	std::string endDate;
+	std::vector <std::pair<std::string, std::string> > conditions;
+	if (param.HasSql()) {
+		conditions = GetConditionsFromParam(param.GetSqc());
+	}
+	CreateDateTimeString(startTime, endTime, tableName, date, startDate, startDatePrev, endDate);
 
 	std::string query = std::string("SELECT ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_VALUE) + std::string("  AS '") + std::string(TAG_TABLE_COLUMN_VALUE) + std::string("' , ") + date + std::string(" AS '") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) +
 		std::string("' FROM ") + tableName + std::string(" WHERE ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_TAG_INDEX) + std::string(" = ") +
@@ -269,13 +236,13 @@ std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementConditionVal
 	}
 
 	std::string post;
-	//if (param.HasPostPoint()) {
+	if (param.HasPostPoint()) {
 		post = std::string("SELECT TOP(1) ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_VALUE) + std::string("  AS '") + std::string(TAG_TABLE_COLUMN_VALUE) +
 			std::string("' , ") + date + std::string(" AS '") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) + std::string("' FROM ") + tableName + std::string(" WHERE ") +
 			tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_TAG_INDEX) + std::string(" = ") +
 			std::to_string(tagItr->second.GetTagId()) + std::string(" AND ") + date + std::string(" >= '") + endDate +
 			std::string("' ORDER BY ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_DATE_TIME) + std::string(" ASC");
-	//}
+	}
 
 	if (param.HasSql()) {
 		std::vector <std::pair<std::string, std::string> > conditions = GetConditionsFromParam(param.GetSqc());
@@ -288,9 +255,9 @@ std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementConditionVal
 				if (param.HasPrevPoint()) {
 					prevQueries = prevQueries + ParseCondition(itr->first, startDatePrev, std::string("'") + startDate + std::string("'"), tags) + itr->second;
 				}
-				//if (param.HasPostPoint()) {
+				if (param.HasPostPoint()) {
 					postQueries = postQueries + ParseCondition(itr->first, std::string("'") + endDate + std::string("'"), std::string(), tags) + itr->second;
-				//}
+				}
 			}
 		}
 		if (param.HasPrevPoint()) {
@@ -306,16 +273,24 @@ std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementConditionVal
 			std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) +
 			std::string("= TagsConditions.") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC);
 
-		//if (param.HasPostPoint()) {
+		if (param.HasPostPoint()) {
 			post = std::string(" UNION ALL ") + std::string("SELECT PostTag.") + std::string(TAG_TABLE_COLUMN_VALUE) + std::string(", PostTag.") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) +
 				std::string(", TagPostConditions.") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) + std::string(" AS '") + std::string(TAG_TABLE_COLUMN_CONDITION_DATE_TIME_MILLISEC) +
 				std::string("' FROM (") + post + std::string(") AS PostTag LEFT OUTER JOIN (") + postQueries + (") AS TagPostConditions ON PostTag.") +
 				std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) +
 				std::string("= TagPostConditions.") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC);
 			query += post;
-		//}
+		}
 	}
-
+	else {
+		if (param.HasPrevPoint()) {
+			prev += std::string(" UNION ALL ");
+		}
+		query = prev + query;
+		if (param.HasPostPoint()) {
+			query = query + std::string(" UNION ALL ") + post;
+		}
+	}
 	std::string limitCondition = std::string(" ORDER BY ") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC);
 	if (param.GetLimit().IsLimit()) {
 		if (param.GetLimit().m_nLimitSide) {
@@ -331,46 +306,58 @@ std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementConditionVal
 	return query;
 }
 
-std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementLastValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, short tagId, short dataType)
+std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementLastValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, const std::map<std::string, TagItemRecord>& tags)
 {
 	
 	/*SELECT TOP(1) FloatTable.Val, DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndTime) AS 'DateTime' FROM FloatTable INNER JOIN TagTable ON FloatTable.TagIndex = TagTable.TagIndex
 WHERE TagTable.TagName = '[PLC_CP]ZSL_1011.Sts_Closed' AND DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndTime) > DATEADD(day,-2, '2019-05-29') AND
 DATEADD(millisecond,FloatTable.Millitm,FloatTable.DateAndTime) <=  '2019-06-16' ORDER BY FloatTable.DateAndTime DESC*/
-	std::string tableName = GetTableNameFromDataType(dataType);
+	std::map<std::string, TagItemRecord >::const_iterator tagItr = tags.find(param.GetAddress());
+	if (tagItr == tags.cend()) {
+		return std::string();
+	}
+	std::string tableName = GetTableNameFromDataType(tagItr->second.GetTagDataType());
 	if (tableName.empty()) {
 		return tableName;
 	}
-	std::string date = std::string(" DATEADD(millisecond,") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_MILLITM) + std::string(",") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_DATE_TIME) + std::string(")");
+
+	std::string date = std::string("DATEADD(millisecond,") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_MILLITM) + std::string(",") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_DATE_TIME) + std::string(")");
+
 	std::string startDate = std::to_string(startTime.wYear) + std::string("-") + std::to_string(startTime.wMonth) + std::string("-") +
 		std::to_string(startTime.wDay) + std::string(" ") + std::to_string(startTime.wHour) + std::string(":") +
 		std::to_string(startTime.wMinute) + std::string(":") + std::to_string(startTime.wSecond);
+
+	std::string startDatePrev = std::string("DATEADD(day, ") + std::string("-") + m_attributes.daysBack + std::string(", '") + startDate + std::string("') ");
+
 	std::string endDate = std::to_string(endTime.wYear) + std::string("-") + std::to_string(endTime.wMonth) + std::string("-") +
 		std::to_string(endTime.wDay) + std::string(" ") + std::to_string(endTime.wHour) + std::string(":") +
 		std::to_string(endTime.wMinute) + std::string(":") + std::to_string(endTime.wSecond);
 
-	std::string query = std::string("SELECT TOP(1) ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_VALUE) + std::string(", ") + date + std::string(" AS ") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) +
-		std::string(" FROM ") + tableName + std::string(" INNER JOIN ") + std::string(TAG_TABLE_NAME) + std::string(" ON ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_TAG_INDEX) + std::string(" = ") + std::string(TAG_TABLE_NAME) + std::string(".") +
-		std::string(TAG_TABLE_COLUMN_TAG_INDEX) + std::string(" WHERE ") + std::string(TAG_TABLE_NAME) + std::string(".") + std::string(TAG_TABLE_COLUMN_TAG_NAME) + std::string(" = ") +
-		std::string("'") + param.GetAddress() + std::string("' ");
-	std::string startTimeCondition = date + std::string(" > ");
+	std::string query = std::string("SELECT TOP(1) ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_VALUE) + std::string(" AS '") + std::string(TAG_TABLE_COLUMN_VALUE) + std::string("', ") +
+		date + std::string(" AS '") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) + 
+		std::string("' FROM ") + tableName + std::string(" WHERE ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_TAG_INDEX) + std::string(" = ") +
+		std::to_string(tagItr->second.GetTagId()) + std::string(" AND ") + date + std::string(" > '") + startDate + std::string("' AND ") + date + std::string(" < '") + endDate + std::string("'");
+	
+	std::string prev;
 	if (param.HasPrevPoint()) {
-		startTimeCondition = startTimeCondition + std::string("DATEADD(day, ") + std::string("-") + m_attributes.daysBack + std::string(", '") + startDate + std::string("') ");
+		prev = std::string("SELECT TOP(1) ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_VALUE) + std::string("  AS '") +
+			std::string(TAG_TABLE_COLUMN_VALUE) + std::string("' , ") + date + std::string(" AS '") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) +
+			std::string("' FROM ") + tableName + std::string(" WHERE ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_TAG_INDEX) + std::string(" = ") +
+			std::to_string(tagItr->second.GetTagId()) + std::string(" AND ") +
+			date + std::string(" >= DATEADD(day, ") + std::string("-") + m_attributes.daysBack + std::string(", '") + startDate + std::string("') AND ") +
+			date + std::string(" < '") + startDate + std::string("' ORDER BY ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_DATE_TIME) + std::string(" DESC");
 	}
-	else {
-		startTimeCondition = startTimeCondition + std::string(" '") + startDate + std::string("' ");
-	}
-	std::string endTimeCondition;
+
+	std::string post;
 	if (param.HasPostPoint()) {
-		endTimeCondition = date + std::string(" <= ") + std::string(" '") + endDate + std::string("' ");
+		post = std::string("SELECT TOP(1) ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_VALUE) + std::string("  AS '") + std::string(TAG_TABLE_COLUMN_VALUE) +
+			std::string("' , ") + date + std::string(" AS '") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) + std::string("' FROM ") + tableName + std::string(" WHERE ") +
+			tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_TAG_INDEX) + std::string(" = ") +
+			std::to_string(tagItr->second.GetTagId()) + std::string(" AND ") + date + std::string(" >= '") + endDate +
+			std::string("' ORDER BY ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_DATE_TIME) + std::string(" ASC");
 	}
-	else {
-		endTimeCondition = date + std::string(" < ") + std::string(" '") + endDate + std::string("' ");
-	}
-	query = query + std::string(" AND ") + startTimeCondition + std::string(" AND ") + endTimeCondition;
-	if (param.HasSql()) {
-		query = query + std::string(" ") + param.GetSqc();
-	}
+
+
 	std::string limitCondition = std::string(" ORDER BY ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_DATE_TIME) + std::string(" DESC");
 
 	query = query + limitCondition;
@@ -708,4 +695,64 @@ std::vector<std::pair<std::string, std::string> > DrvFTSQLHdaItem::SQLServerTagR
 	}
 	res.push_back(std::make_pair<std::string, std::string>(sql.substr(posPrevBegin, std::string::npos), std::string()));
 	return res;
+}
+
+void DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateDateTimeString(const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, const std::string& tableName, std::string& date, std::string& startDate, std::string& startDatePrev, std::string& endDate)
+{
+	date = std::string("DATEADD(millisecond,") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_MILLITM) + std::string(",") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_DATE_TIME) + std::string(")");
+
+	startDate = std::to_string(startTime.wYear) + std::string("-") + std::to_string(startTime.wMonth) + std::string("-") +
+		std::to_string(startTime.wDay) + std::string(" ") + std::to_string(startTime.wHour) + std::string(":") +
+		std::to_string(startTime.wMinute) + std::string(":") + std::to_string(startTime.wSecond);
+
+	startDatePrev = std::string("DATEADD(day, ") + std::string("-") + m_attributes.daysBack + std::string(", '") + startDate + std::string("') ");
+
+	endDate = std::to_string(endTime.wYear) + std::string("-") + std::to_string(endTime.wMonth) + std::string("-") +
+		std::to_string(endTime.wDay) + std::string(" ") + std::to_string(endTime.wHour) + std::string(":") +
+		std::to_string(endTime.wMinute) + std::string(":") + std::to_string(endTime.wSecond);
+}
+
+void DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreatePrevPointSql(std::string& prev, const std::string& tableName, short tagId, const std::string& startDate, const std::vector <std::pair<std::string, std::string> >& conditions, const std::map<std::string, TagItemRecord>& tags)
+{
+	std::string date = std::string("DATEADD(millisecond,") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_MILLITM) + std::string(",") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_DATE_TIME) + std::string(")");
+	std::string startDatePrev = std::string("DATEADD(day, ") + std::string("-") + m_attributes.daysBack + std::string(", '") + startDate + std::string("') ");
+	prev = std::string("SELECT TOP(1) ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_VALUE) + std::string("  AS '") +
+		std::string(TAG_TABLE_COLUMN_VALUE) + std::string("' , ") + date + std::string(" AS '") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) +
+		std::string("' FROM ") + tableName + std::string(" WHERE ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_TAG_INDEX) + std::string(" = ") +
+		std::to_string(tagId) + std::string(" AND ") +
+		date + std::string(" >= DATEADD(day, ") + std::string("-") + m_attributes.daysBack + std::string(", '") + startDate + std::string("') AND ") +
+		date + std::string(" < '") + startDate + std::string("' ORDER BY ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_DATE_TIME) + std::string(" DESC");
+	if (!conditions.empty()) {
+		std::string prevQueries;
+		for (std::vector <std::pair<std::string, std::string> >::const_iterator itr = conditions.cbegin(); itr != conditions.cend(); ++itr) {
+			prevQueries = prevQueries + ParseCondition(itr->first, startDatePrev, std::string("'") + startDate + std::string("'"), tags) + itr->second;
+		}
+		prev = std::string("SELECT PrevTag.") + std::string(TAG_TABLE_COLUMN_VALUE) + std::string(", PrevTag.") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) +
+			std::string(" FROM (") + prev + std::string(") AS PrevTag INNER JOIN (") + prevQueries + (") AS TagPrevConditions ON PrevTag.") +
+			std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) +
+			std::string("= TagPrevConditions.") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC);
+	}
+	prev += std::string(" UNION ALL ");
+}
+
+void DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreatePostPointSql(std::string& post, const std::string& tableName, short tagId, const std::string& endDate, const std::vector <std::pair<std::string, std::string> >& conditions, const std::map<std::string, TagItemRecord>& tags)
+{
+	std::string date = std::string("DATEADD(millisecond,") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_MILLITM) + std::string(",") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_DATE_TIME) + std::string(")");
+	post = std::string("SELECT TOP(1) ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_VALUE) + std::string("  AS '") + std::string(TAG_TABLE_COLUMN_VALUE) +
+		std::string("' , ") + date + std::string(" AS '") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) + std::string("' FROM ") + tableName + std::string(" WHERE ") +
+		tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_TAG_INDEX) + std::string(" = ") +
+		std::to_string(tagId) + std::string(" AND ") + date + std::string(" >= '") + endDate +
+		std::string("' ORDER BY ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_DATE_TIME) + std::string(" ASC");
+	if (!conditions.empty()) {
+		std::string postQueries;
+		for (std::vector <std::pair<std::string, std::string> >::const_iterator itr = conditions.cbegin(); itr != conditions.cend(); ++itr) {
+			postQueries = postQueries + ParseCondition(itr->first, std::string("'") + endDate + std::string("'"), std::string(), tags) + itr->second;
+		}
+		post = std::string("SELECT PostTag.") + std::string(TAG_TABLE_COLUMN_VALUE) + std::string(", PostTag.") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) +
+			std::string(", TagPostConditions.") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) + std::string(" AS '") + std::string(TAG_TABLE_COLUMN_CONDITION_DATE_TIME_MILLISEC) +
+			std::string("' FROM (") + post + std::string(") AS PostTag LEFT OUTER JOIN (") + postQueries + (") AS TagPostConditions ON PostTag.") +
+			std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) +
+			std::string("= TagPostConditions.") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC);
+	}
+	post = std::string(" UNION ALL ") + post;
 }
