@@ -360,6 +360,11 @@ std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::ParseCondition(const std::s
 std::vector<std::pair<std::string, std::string> > DrvFTSQLHdaItem::SQLServerTagRecordsDAO::GetConditionsFromParam(std::string&& sql)
 {
 	std::vector<std::pair<std::string, std::string> > res;
+	size_t posBegin = sql.find("[i#.", 0);
+	if (posBegin == std::string::npos) {
+		Log::GetInstance()->WriteInfo(_T("Could not parse the conditions"));
+		return res;
+	}
 	size_t posPrevBegin = 0;
 	size_t posOrBegin = sql.find("OR", 0);
 	size_t posAndBegin = sql.find("AND", 0);
@@ -415,11 +420,19 @@ void DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreatePrevPointSql(std::string& pr
 			std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) + std::string("' FROM (") + prev + std::string(") AS PrevTag INNER JOIN (") + prevQueries + (") AS TagPrevConditions ON PrevTag.") +
 			std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) + std::string("= TagPrevConditions.") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC);
 	}
+	else {
+		prev = std::string("SELECT PrevTag.") + std::string(TAG_TABLE_COLUMN_VALUE) + std::string("  AS '") + std::string(TAG_TABLE_COLUMN_VALUE) +
+			std::string("' , PrevTag.") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) + std::string(" AS '") +
+			std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) + std::string("' FROM (") + prev + std::string(") AS PrevTag");
+	}
 	prev += std::string(" UNION ALL ");
 }
 
 void DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreatePrevPointConditionalSql(std::string& prev, const std::string& tableName, short tagId, const std::string& startDate, const std::vector <std::pair<std::string, std::string> >& conditions, const std::map<std::string, TagItemRecord>& tags)
 {
+	if (conditions.empty()) {
+		return;
+	}
 	std::string date = std::string("DATEADD(millisecond,") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_MILLITM) + std::string(",") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_DATE_TIME) + std::string(")");
 	std::string startDatePrev = std::string("DATEADD(day, ") + std::string("-") + m_attributes.daysBack + std::string(", '") + startDate + std::string("') ");
 	
@@ -466,11 +479,19 @@ void DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreatePostPointSql(std::string& po
 			std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) +
 			std::string("= TagPostConditions.") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC);
 	}
+	else {
+		post = std::string("SELECT PostTag.") + std::string(TAG_TABLE_COLUMN_VALUE) + std::string("  AS '") + std::string(TAG_TABLE_COLUMN_VALUE) +
+			std::string("' , PostTag.") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) + std::string(" AS '") + std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC) +
+			std::string("' FROM (") + post + std::string(") AS PostTag");
+	}
 	post = std::string(" UNION ALL ") + post;
 }
 
 void DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreatePostPointConditionalSql(std::string& post, const std::string& tableName, short tagId, const std::string& endDate, const std::vector <std::pair<std::string, std::string> >& conditions, const std::map<std::string, TagItemRecord>& tags)
 {
+	if (conditions.empty()) {
+		return;
+	}
 	std::string date = std::string("DATEADD(millisecond,") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_MILLITM) + std::string(",") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_DATE_TIME) + std::string(")");
 	
 	post = std::string("SELECT TOP(1) ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_VALUE) + std::string("  AS '") + std::string(TAG_TABLE_COLUMN_VALUE) +
