@@ -114,7 +114,7 @@ int DrvFTSQLHdaItem::HdaCommandHandler::ExecuteCommand(ODS::HdaCommand* pCommand
 		if (queriesList.empty()) {
 			return ODS::ERR::DB_NO_DATA;
 		}
-		ExecuteQueriesList(requestMap, queriesList, pResultList, sessionID);
+		ExecuteQueriesList(requestMap, queriesList, pResultList, startUtc, endUtc, sessionID);
 		if (sessionId.IsEmpty()) {
 			m_database->CloseConnectionWithUUID(sessionID);
 		}
@@ -415,9 +415,12 @@ void DrvFTSQLHdaItem::HdaCommandHandler::CreateQueriesList(const std::map<int, s
 	}
 }
 
-void DrvFTSQLHdaItem::HdaCommandHandler::ExecuteQueriesList(const std::map<int, std::vector<ODS::HdaFunction*> >& requestFunctions, const std::map<int, std::vector<std::string> >& queriesList, std::vector<ODS::HdaFunctionResult*>* pResultList, const std::string& sessionId)
+void DrvFTSQLHdaItem::HdaCommandHandler::ExecuteQueriesList(const std::map<int, std::vector<ODS::HdaFunction*> >& requestFunctions, const std::map<int, std::vector<std::string> >& queriesList, std::vector<ODS::HdaFunctionResult*>* pResultList, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, const std::string& sessionId)
 {
-	
+	SYSTEMTIME localStartDataTime = { 0 };
+	SYSTEMTIME localEndDataTime = { 0 };
+	ODS::TimeUtils::SysTimeUtcToLocal(startTime, &localStartDataTime);
+	ODS::TimeUtils::SysTimeUtcToLocal(endTime, &localEndDataTime);
 	for (std::map<int, std::vector<std::string> >::const_iterator queriesIterator = queriesList.cbegin(); queriesIterator != queriesList.cend(); ++queriesIterator) {
 		size_t length = queriesIterator->second.size();
 		for (size_t index = 0; index < length; ++index) {
@@ -429,17 +432,79 @@ void DrvFTSQLHdaItem::HdaCommandHandler::ExecuteQueriesList(const std::map<int, 
 			if (funcIterator != requestFunctions.cend() && index < funcIterator->second.size()) {
 				if (funcIterator->first == ODS::HdaFunctionType::VALUE_LIST_CONDITION) {
 					ODS::HdaFunctionResultVLC* pFuncResult = new ODS::HdaFunctionResultVLC;
+					std::vector<bool> conditions;
+					std::vector<ODS::TvqListElementDescription> listDesc;
 					pFuncResult->SetContext(funcIterator->second.at(index)->GetContext());
+					
 					for (std::vector<Record>::const_iterator itr = vec.cbegin(); itr != vec.cend(); ++itr) {
-						pFuncResult->AddTvq(new ODS::Tvq(CreateTvqFromRecord(*itr)));
+						bool condition = false;
+						ODS::Tvq* tvq = CreateTvqFromRecord(*itr, &condition);
+						if (itr == vec.cbegin()) {
+							if (ODS::TimeUtils::SysTimeCompare(tvq->GetTimestampLoc(), localStartDataTime) < 0) {
+								ODS::TvqListElementDescription desc;
+								desc.m_nIndex = 0;
+								desc.m_ulFlags = ODS::TvqListElementDescription::PREV_POINT;
+								listDesc.push_back(desc);
+							}
+						}
+						if (itr == vec.cend() - 1) {
+							if (ODS::TimeUtils::SysTimeCompare(tvq->GetTimestampLoc(), localEndDataTime) > 0) {
+								ODS::TvqListElementDescription desc;
+								desc.m_nIndex = vec.size() - 1;
+								desc.m_ulFlags = ODS::TvqListElementDescription::POST_POINT;
+								listDesc.push_back(desc);
+							}
+						}
+						pFuncResult->AddTvq(tvq);
+						conditions.push_back(condition);
+					}
+					bool* conditionsList = new bool[conditions.size()];
+					for (size_t conditionItr = 0; conditionItr < conditions.size(); ++conditionItr) {
+						*(conditionsList + conditionItr) = conditions.at(conditionItr);
+					}
+					pFuncResult->SetConditionValueList(conditionsList, conditions.size());
+					
+					if (!listDesc.empty()) {
+						ODS::TvqListElementDescription* desc = new ODS::TvqListElementDescription[listDesc.size()];
+						for (size_t descItr = 0; descItr < listDesc.size(); descItr++) {
+							(desc + descItr)->m_nIndex = listDesc.at(descItr).m_nIndex;
+							(desc + descItr)->m_ulFlags = listDesc.at(descItr).m_ulFlags;
+						}
+						pFuncResult->SetTvqDescList(desc, listDesc.size());
 					}
 					pResultList->push_back(pFuncResult);
 				}
 				else {
 					ODS::HdaFunctionResultValueList* pFuncResult = new ODS::HdaFunctionResultValueList;
 					pFuncResult->SetContext(funcIterator->second.at(index)->GetContext());
+					std::vector<ODS::TvqListElementDescription> listDesc;
 					for (std::vector<Record>::const_iterator itr = vec.cbegin(); itr != vec.cend(); ++itr) {
-						pFuncResult->AddTvq(new ODS::Tvq(CreateTvqFromRecord(*itr)));
+						ODS::Tvq* tvq = CreateTvqFromRecord(*itr, nullptr);
+						if (itr == vec.cbegin()) {
+							if (ODS::TimeUtils::SysTimeCompare(tvq->GetTimestampLoc(), localStartDataTime) < 0) {
+								ODS::TvqListElementDescription desc;
+								desc.m_nIndex = 0;
+								desc.m_ulFlags = ODS::TvqListElementDescription::PREV_POINT;
+								listDesc.push_back(desc);
+							}
+						}
+						if (itr == vec.cend() - 1) {
+							if (ODS::TimeUtils::SysTimeCompare(tvq->GetTimestampLoc(), localEndDataTime) > 0) {
+								ODS::TvqListElementDescription desc;
+								desc.m_nIndex = vec.size() - 1;
+								desc.m_ulFlags = ODS::TvqListElementDescription::POST_POINT;
+								listDesc.push_back(desc);
+							}
+						}
+						pFuncResult->AddTvq(tvq);
+					}
+					if (!listDesc.empty()) {
+						ODS::TvqListElementDescription* desc = new ODS::TvqListElementDescription[listDesc.size()];
+						for (size_t descItr = 0; descItr < listDesc.size(); descItr++) {
+							(desc + descItr)->m_nIndex = listDesc.at(descItr).m_nIndex;
+							(desc + descItr)->m_ulFlags = listDesc.at(descItr).m_ulFlags;
+						}
+						pFuncResult->SetTvqDescList(desc, listDesc.size());
 					}
 					pResultList->push_back(pFuncResult);
 				}
@@ -507,7 +572,7 @@ DrvFTSQLHdaItem::ParamValueList DrvFTSQLHdaItem::HdaCommandHandler::GetParameter
 	return valList;
 }
 
-ODS::Tvq DrvFTSQLHdaItem::HdaCommandHandler::CreateTvqFromRecord(const Record& record) const
+ODS::Tvq* DrvFTSQLHdaItem::HdaCommandHandler::CreateTvqFromRecord(const Record& record, bool* condition) const
 {
 	VARIANT vValue;
 	std::string str;
@@ -517,7 +582,7 @@ ODS::Tvq DrvFTSQLHdaItem::HdaCommandHandler::CreateTvqFromRecord(const Record& r
 	SYSTEMTIME localDataTime = { 0 };
 	float val = 0.0;
 	std::string miliStr;
-	ODS::Tvq tvq;
+	ODS::Tvq* tvq = new ODS::Tvq();
 	for (Record::const_iterator itr = record.cbegin(); itr != record.cend(); ++itr) {
 		switch (itr->second.first)
 		{
@@ -525,7 +590,7 @@ ODS::Tvq DrvFTSQLHdaItem::HdaCommandHandler::CreateTvqFromRecord(const Record& r
 			::VariantInit(&vValue);
 			vValue.vt = VT_R8;
 			vValue.dblVal = std::stod(itr->second.second);
-			tvq.SetValue(vValue);
+			tvq->SetValue(vValue);
 			::VariantClear(&vValue);
 			break;
 		case SQL_C_FLOAT:
@@ -533,34 +598,41 @@ ODS::Tvq DrvFTSQLHdaItem::HdaCommandHandler::CreateTvqFromRecord(const Record& r
 			vValue.vt = VT_R8;
 			val = std::stof(itr->second.second);
 			vValue.dblVal = val;
-			tvq.SetValue(vValue);
+			tvq->SetValue(vValue);
 			::VariantClear(&vValue);
 			break;
 		case SQL_C_CHAR:
-			tvq.SetValue(ODS::Data::Value(itr->second.second.c_str()));
+			tvq->SetValue(ODS::Data::Value(itr->second.second.c_str()));
 			break;
 		case SQL_C_TYPE_TIMESTAMP:
-			timeStampStruct = reinterpret_cast<const TIMESTAMP_STRUCT*>(itr->second.second .c_str());
-			dataTime.wYear = timeStampStruct->year;
-			dataTime.wMonth = timeStampStruct->month;
-			dataTime.wDay = timeStampStruct->day;
-			dataTime.wHour = timeStampStruct->hour;
-			dataTime.wMinute = timeStampStruct->minute;
-			dataTime.wSecond = timeStampStruct->second;
-			miliStr = std::to_string(timeStampStruct->fraction);
-			if (miliStr.length() > 3) {
-				miliStr.erase(3, miliStr.length() - 3);
+			if (itr->first == std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC)) {
+				timeStampStruct = reinterpret_cast<const TIMESTAMP_STRUCT*>(itr->second.second.c_str());
+				dataTime.wYear = timeStampStruct->year;
+				dataTime.wMonth = timeStampStruct->month;
+				dataTime.wDay = timeStampStruct->day;
+				dataTime.wHour = timeStampStruct->hour;
+				dataTime.wMinute = timeStampStruct->minute;
+				dataTime.wSecond = timeStampStruct->second;
+				miliStr = std::to_string(timeStampStruct->fraction);
+				if (miliStr.length() > 3) {
+					miliStr.erase(3, miliStr.length() - 3);
+				}
+				dataTime.wMilliseconds = std::stoul(miliStr);
+				//ODS::OdbcLib::ConvertTimestampStructToSysTime(dataTime, &utcDataTime);
+				ODS::TimeUtils::SysTimeUtcToLocal(dataTime, &localDataTime);
+				tvq->SetTimestamp(&localDataTime);
 			}
-			dataTime.wMilliseconds = std::stoul(miliStr);
-			//ODS::OdbcLib::ConvertTimestampStructToSysTime(dataTime, &utcDataTime);
-			ODS::TimeUtils::SysTimeUtcToLocal(dataTime, &localDataTime);
-			tvq.SetTimestamp(&localDataTime);
+			else if (itr->first == std::string(TAG_TABLE_COLUMN_CONDITION_DATE_TIME_MILLISEC) && condition != nullptr) {
+				if (itr->second.second.empty() == false) {
+					*condition = true;
+				}
+			}
 			break;
 		default:
 			break;
 		}
 	}
-	tvq.SetQuality(ODS::Tvq::QUALITY_GOOD);
+	tvq->SetQuality(ODS::Tvq::QUALITY_GOOD);
 	return tvq;
 	
 }

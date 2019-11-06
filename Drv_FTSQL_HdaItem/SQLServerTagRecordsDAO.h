@@ -47,6 +47,9 @@ namespace DrvFTSQLHdaItem
 		std::vector<std::pair<std::string, std::string>> GetConditionsFromParam( std::string&& sql);
 		void CreateDateTimeString(const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, const std::string& tableName, std::string& date, std::string& startDate, std::string& startDatePrev, std::string& endDate);
 		void CreatePrevPointSql(std::string& prev, const std::string& tableName, short tagId, const std::string& startDate, const std::vector <std::pair<std::string, std::string> >& conditions, const std::map<std::string, TagItemRecord>& tags);
-		void CreatePostPointSql(std::string& prev, const std::string& tableName, short tagId, const std::string& endDate, const std::vector <std::pair<std::string, std::string> >& conditions, const std::map<std::string, TagItemRecord>& tags);
+		void CreatePrevPointConditionalSql(std::string& prev, const std::string& tableName, short tagId, const std::string& startDate, const std::vector <std::pair<std::string, std::string> >& conditions, const std::map<std::string, TagItemRecord>& tags);
+		void CreatePostPointSql(std::string& post, const std::string& tableName, short tagId, const std::string& endDate, const std::vector <std::pair<std::string, std::string> >& conditions, const std::map<std::string, TagItemRecord>& tags);
+		void CreatePostPointConditionalSql(std::string& post, const std::string& tableName, short tagId, const std::string& endDate, const std::vector <std::pair<std::string, std::string> >& conditions, const std::map<std::string, TagItemRecord>& tags);
+		std::string CreateStatementList(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, const std::map<std::string, TagItemRecord>& tags);
 	};
 }

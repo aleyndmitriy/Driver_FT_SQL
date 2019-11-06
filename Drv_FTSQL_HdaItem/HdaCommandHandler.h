@@ -36,8 +36,9 @@ namespace DrvFTSQLHdaItem
 		std::vector<std::string> BuildCmdTimeStampMaxValue(const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, const std::vector<ODS::HdaFunction*>& rFuncList, const std::map<std::string, TagItemRecord>& tags);
 		std::vector<std::string> BuildCmdTimeStampMinValue(const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, const std::vector<ODS::HdaFunction*>& rFuncList, const std::map<std::string, TagItemRecord>& tags);
 		ParamValueList GetParameterValueList(const ODS::HdaFunction* pHdaFunc);
-		ODS::Tvq CreateTvqFromRecord(const Record& record) const;
+		ODS::Tvq* CreateTvqFromRecord(const Record& record, bool* condition) const;
 		void CreateQueriesList(const std::map<int, std::vector<ODS::HdaFunction*> >& requestFunctions, std::map<int, std::vector<std::string> >& queriesList, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, const std::string& sessionId);
-		void ExecuteQueriesList(const std::map<int, std::vector<ODS::HdaFunction*> >& requestFunctions, const std::map<int, std::vector<std::string> >& queriesList, std::vector<ODS::HdaFunctionResult*>* pResultList, const std::string& sessionId);
+		void ExecuteQueriesList(const std::map<int, std::vector<ODS::HdaFunction*> >& requestFunctions, const std::map<int, std::vector<std::string> >& queriesList, std::vector<ODS::HdaFunctionResult*>* pResultList, const SYSTEMTIME& startTime,
+			const SYSTEMTIME& endTime, const std::string& sessionId);
 	};
 }
