@@ -34,7 +34,6 @@ private:
 	CEdit m_editUserName;
 	CEdit m_editPassword;
 	CComboBox m_cbDatabase;
-	CEdit m_editDataQuality;
 	CEdit m_editDays;
 	BOOL OnInitDialog() override;
 	void LoadDatabasesList(const std::vector<std::string>& databases);

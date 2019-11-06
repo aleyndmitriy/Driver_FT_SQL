@@ -184,9 +184,9 @@ std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementConditionVal
 	}
 
 	std::string post;
-	//if (param.HasPostPoint()) {
+	if (param.HasPostPoint()) {
 		CreatePostPointConditionalSql(post, tableName, tagItr->second.GetTagId(), endDate, conditions, tags);
-	//}
+	}
 
 	if (!conditions.empty()) {
 		std::string queries;
@@ -526,9 +526,9 @@ std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementList(ParamVa
 	}
 
 	std::string post;
-	//if (param.HasPostPoint()) {
+	if (param.HasPostPoint()) {
 		CreatePostPointSql(post, tableName, tagItr->second.GetTagId(), endDate, conditions, tags);
-	//}
+	}
 
 	if (!conditions.empty()) {
 		std::string queries;

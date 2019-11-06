@@ -33,7 +33,6 @@ void DlgConnectionSqlSvr::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_USERNAME, m_editUserName);
 	DDX_Control(pDX, IDC_EDIT_PASSWORD, m_editPassword);
 	DDX_Control(pDX, IDC_COMBO_DATABASE, m_cbDatabase);
-	DDX_Control(pDX, IDC_EDIT_DATA_QUALITY, m_editDataQuality);
 	DDX_Control(pDX, IDC_EDIT_DAYS_BACK, m_editDays);
 }
 
@@ -79,9 +78,6 @@ BOOL DlgConnectionSqlSvr::OnInitDialog()
 		m_cbAuth.SetCurSel(0);
 		m_editUserName.EnableWindow(FALSE);
 		m_editPassword.EnableWindow(FALSE);
-	}
-	if (!m_connectAttributes->dataQuality.empty()) {
-		m_editDataQuality.SetWindowTextA(m_connectAttributes->dataQuality.c_str());
 	}
 	if (!m_connectAttributes->daysBack.empty()) {
 		m_editDays.SetWindowTextA(m_connectAttributes->daysBack.c_str());
@@ -168,10 +164,6 @@ void DlgConnectionSqlSvr::ReadAttributes()
 	m_connectAttributes->databaseName = std::string(str.GetBuffer(len));
 	str.ReleaseBuffer();
 	str.Empty();
-	m_editDataQuality.GetWindowTextA(str);
-	m_connectAttributes->dataQuality = std::string(str.GetBuffer());
-	str.ReleaseBuffer();
-	str.Empty();
 	m_editDays.GetWindowTextA(str);
 	m_connectAttributes->daysBack = std::string(str.GetBuffer());
 	str.ReleaseBuffer();
@@ -256,8 +248,15 @@ void DlgConnectionSqlSvr::ConnectToServer()
 {
 	StartLoading();
 	ReadAttributes();
+	if (m_connectAttributes->driver.empty()) {
+		m_connectAttributes->driver = std::string("SQL Server Native Client 11.0");
+	}
 	if (m_database->OpenConnectionIfNeeded(*m_connectAttributes)) {
 		LoadDatabasesList(m_database->GetDatabasesList());
+	}
+	else {
+		std::vector<std::string> databaseNames;
+		LoadDatabasesList(databaseNames);
 	}
 	StopLoading();
 }
