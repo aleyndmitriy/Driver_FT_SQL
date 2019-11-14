@@ -581,7 +581,7 @@ ODS::Tvq* DrvFTSQLHdaItem::HdaCommandHandler::CreateTvqFromRecord(const Record& 
 	//SYSTEMTIME utcDataTime = { 0 };
 	SYSTEMTIME localDataTime = { 0 };
 	float val = 0.0;
-	std::string miliStr;
+	WORD millisec;
 	ODS::Tvq* tvq = new ODS::Tvq();
 	for (Record::const_iterator itr = record.cbegin(); itr != record.cend(); ++itr) {
 		switch (itr->second.first)
@@ -601,11 +601,17 @@ ODS::Tvq* DrvFTSQLHdaItem::HdaCommandHandler::CreateTvqFromRecord(const Record& 
 			tvq->SetValue(vValue);
 			::VariantClear(&vValue);
 			break;
+		case SQL_C_SHORT:
+		case SQL_C_TINYINT:
+			if (!itr->second.second.empty() && itr->second.second.size() > 0) {
+				millisec = std::stoi(itr->second.second);
+			}
+			break;
 		case SQL_C_CHAR:
 			tvq->SetValue(ODS::Data::Value(itr->second.second.c_str()));
 			break;
 		case SQL_C_TYPE_TIMESTAMP:
-			if (itr->first == std::string(TAG_TABLE_COLUMN_DATE_TIME_MILLISEC)) {
+			if (itr->first == std::string(TAG_TABLE_COLUMN_DATE_TIME)) {
 				timeStampStruct = reinterpret_cast<const TIMESTAMP_STRUCT*>(itr->second.second.c_str());
 				dataTime.wYear = timeStampStruct->year;
 				dataTime.wMonth = timeStampStruct->month;
@@ -613,16 +619,8 @@ ODS::Tvq* DrvFTSQLHdaItem::HdaCommandHandler::CreateTvqFromRecord(const Record& 
 				dataTime.wHour = timeStampStruct->hour;
 				dataTime.wMinute = timeStampStruct->minute;
 				dataTime.wSecond = timeStampStruct->second;
-				miliStr = std::to_string(timeStampStruct->fraction);
-				if (miliStr.length() > 3) {
-					miliStr.erase(3, miliStr.length() - 3);
-				}
-				dataTime.wMilliseconds = std::stoul(miliStr);
-				//ODS::OdbcLib::ConvertTimestampStructToSysTime(dataTime, &utcDataTime);
-				ODS::TimeUtils::SysTimeUtcToLocal(dataTime, &localDataTime);
-				tvq->SetTimestamp(&localDataTime);
 			}
-			else if (itr->first == std::string(TAG_TABLE_COLUMN_CONDITION_DATE_TIME_MILLISEC) && condition != nullptr) {
+			else if (itr->first == std::string(TAG_TABLE_COLUMN_CONDITION_DATE_TIME) && condition != nullptr) {
 				if (itr->second.second.empty() == false) {
 					*condition = true;
 				}
@@ -632,6 +630,10 @@ ODS::Tvq* DrvFTSQLHdaItem::HdaCommandHandler::CreateTvqFromRecord(const Record& 
 			break;
 		}
 	}
+	dataTime.wMilliseconds = millisec;
+	//ODS::OdbcLib::ConvertTimestampStructToSysTime(dataTime, &utcDataTime);
+	ODS::TimeUtils::SysTimeUtcToLocal(dataTime, &localDataTime);
+	tvq->SetTimestamp(&localDataTime);
 	tvq->SetQuality(ODS::Tvq::QUALITY_GOOD);
 	return tvq;
 	
