@@ -189,9 +189,9 @@ std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementConditionVal
 	}
 
 	std::string post;
-	//if (param.HasPostPoint()) {
+	if (param.HasPostPoint()) {
 		CreatePostPointConditionalSql(post, tableName, tagItr->second.GetTagId(), endDate, conditions, tags);
-	//}
+	}
 
 	if (!conditions.empty()) {
 		std::string queries;
@@ -268,7 +268,7 @@ std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementMaxValue(Par
 std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementSumValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, const std::map<std::string, TagItemRecord>& tags)
 {
 	std::string query = CreateStatementList(std::move(param), startTime, endTime, tags);
-	query = std::string("SELECT SUM(UNION_TABLE.") + std::string(TAG_TABLE_COLUMN_VALUE) + std::string("), '1970-01-01 00:00:00.000' AS ") + std::string(TAG_TABLE_COLUMN_DATE_TIME) +
+	query = std::string("SELECT SUM(UNION_TABLE.") + std::string(TAG_TABLE_COLUMN_VALUE) + std::string(") AS '") + std::string(TAG_TABLE_COLUMN_VALUE) + std::string("' , NULL AS ") + std::string(TAG_TABLE_COLUMN_DATE_TIME) +
 		std::string(" FROM (") + query + std::string(") AS UNION_TABLE");
 	return query;
 }
@@ -276,7 +276,7 @@ std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementSumValue(Par
 std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementAvgValue(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, const std::map<std::string, TagItemRecord>& tags)
 {
 	std::string query = CreateStatementList(std::move(param), startTime, endTime, tags);
-	query = std::string("SELECT AVG(UNION_TABLE.") + std::string(TAG_TABLE_COLUMN_VALUE) + std::string("), '1970-01-01 00:00:00.000' AS ") + std::string(TAG_TABLE_COLUMN_DATE_TIME) +
+	query = std::string("SELECT AVG(UNION_TABLE.") + std::string(TAG_TABLE_COLUMN_VALUE) + std::string(") AS '") + std::string(TAG_TABLE_COLUMN_VALUE) + std::string("', NULL AS ") + std::string(TAG_TABLE_COLUMN_DATE_TIME) +
 		std::string(" FROM (") + query + std::string(") AS UNION_TABLE");
 	return query;
 }
@@ -580,9 +580,9 @@ std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementList(ParamVa
 	}
 
 	std::string post; 
-	//if (param.HasPostPoint()) {
+	if (param.HasPostPoint()) {
 		CreatePostPointSql(post, tableName, tagItr->second.GetTagId(), endDate, conditions, tags);
-	//}
+	}
 
 	if (!conditions.empty()) {
 		std::string queries;

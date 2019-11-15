@@ -70,7 +70,7 @@ int DrvFTSQLHdaItem::HdaCommandHandler::ExecuteCommand(ODS::HdaCommand* pCommand
 		ODS::HdaCommandParam** ppCmdParamList = NULL;
 		int nCount = 0;
 		int iRes = pCommand->GetParamList(&ppCmdParamList, &nCount);
-		ODS::Core::Uuid sessionId;
+		ODS::Core::Uuid sessionId = ODS::Core::Uuid::EmptyUuid();
 		SYSTEMTIME currTime;
 		SYSTEMTIME start;
 		SYSTEMTIME end;
@@ -581,7 +581,7 @@ ODS::Tvq* DrvFTSQLHdaItem::HdaCommandHandler::CreateTvqFromRecord(const Record& 
 	//SYSTEMTIME utcDataTime = { 0 };
 	SYSTEMTIME localDataTime = { 0 };
 	float val = 0.0;
-	WORD millisec;
+	WORD millisec = 0;
 	ODS::Tvq* tvq = new ODS::Tvq();
 	for (Record::const_iterator itr = record.cbegin(); itr != record.cend(); ++itr) {
 		switch (itr->second.first)
