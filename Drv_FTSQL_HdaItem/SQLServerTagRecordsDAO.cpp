@@ -339,12 +339,13 @@ std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::GetTableNameFromDataType(sh
 std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::ParseCondition(const std::string& condition, const std::string& startTime, const std::string& endTime, const std::map<std::string, TagItemRecord>& tags)
 {
 	std::string res;
-	size_t posBegin = condition.find("[i#.", 0);
+	size_t posBegin = condition.find("[i#", 0);
 	if (posBegin == std::string::npos) {
 		return res;
 	}
-	posBegin += 4;
-	size_t posEnd = condition.find("]", posBegin);
+	posBegin = condition.find(".", posBegin);
+	posBegin += 1;
+	size_t posEnd = condition.find_last_of(']', condition.size() - 1);
 	if (posEnd == std::string::npos) {
 		return res;
 	}
@@ -374,7 +375,7 @@ std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::ParseCondition(const std::s
 std::vector<std::pair<std::string, std::string> > DrvFTSQLHdaItem::SQLServerTagRecordsDAO::GetConditionsFromParam(std::string&& sql)
 {
 	std::vector<std::pair<std::string, std::string> > res;
-	size_t posBegin = sql.find("[i#.", 0);
+	size_t posBegin = sql.find("[i#", 0);
 	if (posBegin == std::string::npos) {
 		Log::GetInstance()->WriteInfo(_T("Could not parse the conditions"));
 		return res;
