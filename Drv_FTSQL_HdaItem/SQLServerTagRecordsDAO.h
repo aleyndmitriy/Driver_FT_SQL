@@ -44,11 +44,11 @@ namespace DrvFTSQLHdaItem
 		std::unique_ptr<SQLTable> GetTableInfo(const std::string& connectionID, std::string tableName);
 		std::string GetTableNameFromDataType(short dataType);
 		std::string ParseCondition(const std::string& condition, const std::string& startTime, const std::string& endTime, const std::map<std::string, TagItemRecord>& tags);
-		std::vector<std::pair<std::string, std::string>> GetConditionsFromParam( std::string&& sql);
+		std::vector<std::pair<std::string, std::string>> GetConditionsFromParam(const std::string& sql);
 		void CreateDateTimeString(const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, const std::string& tableName, std::string& date, std::string& startDate, std::string& startDatePrev, std::string& endDate);
-		void CreatePrevPointSql(std::string& prev, const std::string& tableName, short tagId, const std::string& startDate, const std::vector <std::pair<std::string, std::string> >& conditions, const std::map<std::string, TagItemRecord>& tags);
+		void CreatePrevPointSql(std::string& prev, const std::string& tableName, short tagId, const std::string& startDate, const std::string& sql, const std::vector <std::pair<std::string, std::string> >& conditions, const std::map<std::string, TagItemRecord>& tags);
 		void CreatePrevPointConditionalSql(std::string& prev, const std::string& tableName, short tagId, const std::string& startDate, const std::vector <std::pair<std::string, std::string> >& conditions, const std::map<std::string, TagItemRecord>& tags);
-		void CreatePostPointSql(std::string& post, const std::string& tableName, short tagId, const std::string& endDate, const std::vector <std::pair<std::string, std::string> >& conditions, const std::map<std::string, TagItemRecord>& tags);
+		void CreatePostPointSql(std::string& post, const std::string& tableName, short tagId, const std::string& endDate, const std::string& sql, const std::vector <std::pair<std::string, std::string> >& conditions, const std::map<std::string, TagItemRecord>& tags);
 		void CreatePostPointConditionalSql(std::string& post, const std::string& tableName, short tagId, const std::string& endDate, const std::vector <std::pair<std::string, std::string> >& conditions, const std::map<std::string, TagItemRecord>& tags);
 		std::string CreateStatementList(ParamValueList&& param, const SYSTEMTIME& startTime, const SYSTEMTIME& endTime, const std::map<std::string, TagItemRecord>& tags);
 	};

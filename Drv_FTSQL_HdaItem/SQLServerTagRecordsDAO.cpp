@@ -372,7 +372,7 @@ std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::ParseCondition(const std::s
 	return res;
 }
 
-std::vector<std::pair<std::string, std::string> > DrvFTSQLHdaItem::SQLServerTagRecordsDAO::GetConditionsFromParam(std::string&& sql)
+std::vector<std::pair<std::string, std::string> > DrvFTSQLHdaItem::SQLServerTagRecordsDAO::GetConditionsFromParam(const std::string& sql)
 {
 	std::vector<std::pair<std::string, std::string> > res;
 	size_t posBegin = sql.find("[i#", 0);
@@ -381,19 +381,31 @@ std::vector<std::pair<std::string, std::string> > DrvFTSQLHdaItem::SQLServerTagR
 		return res;
 	}
 	size_t posPrevBegin = 0;
-	size_t posOrBegin = sql.find("OR", 0);
-	size_t posAndBegin = sql.find("AND", 0);
+	size_t posOrBegin = sql.find(" OR ", 0);
+	if (posOrBegin == std::string::npos) {
+		posOrBegin = sql.find(" or ", 0);
+	}
+	size_t posAndBegin = sql.find(" AND ", 0);
+	if (posAndBegin == std::string::npos) {
+		posAndBegin = sql.find(" and ", 0);
+	}
 	while (posAndBegin != std::string::npos || posOrBegin != std::string::npos) {
 		if (posAndBegin > posOrBegin) {
 			res.push_back(std::make_pair<std::string, std::string>(sql.substr(posPrevBegin, posOrBegin - posPrevBegin), std::string(" UNION ")));
-			posPrevBegin = posOrBegin + 2;
+			posPrevBegin = posOrBegin + 4;
 		}
 		else {
 			res.push_back(std::make_pair<std::string, std::string>(sql.substr(posPrevBegin, posAndBegin - posPrevBegin), std::string(" INTERSECT ")));
-			posPrevBegin = posAndBegin + 3;
+			posPrevBegin = posAndBegin + 5;
 		}
-		posOrBegin = sql.find("OR", posPrevBegin);
+		posOrBegin = sql.find(" OR ", posPrevBegin);
+		if (posOrBegin == std::string::npos) {
+			posOrBegin = sql.find(" or ", posPrevBegin);
+		}
 		posAndBegin = sql.find("AND", posPrevBegin);
+		if (posAndBegin == std::string::npos) {
+			posAndBegin = sql.find(" and ", posPrevBegin);
+		}
 	}
 	res.push_back(std::make_pair<std::string, std::string>(sql.substr(posPrevBegin, std::string::npos), std::string()));
 	return res;
@@ -414,7 +426,7 @@ void DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateDateTimeString(const SYSTEMT
 		std::to_string(endTime.wMinute) + std::string(":") + std::to_string(endTime.wSecond);
 }
 
-void DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreatePrevPointSql(std::string& prev, const std::string& tableName, short tagId, const std::string& startDate, const std::vector <std::pair<std::string, std::string> >& conditions, const std::map<std::string, TagItemRecord>& tags)
+void DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreatePrevPointSql(std::string& prev, const std::string& tableName, short tagId, const std::string& startDate, const std::string& sql, const std::vector <std::pair<std::string, std::string> >& conditions, const std::map<std::string, TagItemRecord>& tags)
 {
 	//std::string date = std::string("DATEADD(millisecond,") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_MILLITM) + std::string(",") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_DATE_TIME) + std::string(")");
 	std::string date = tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_DATE_TIME);
@@ -426,7 +438,11 @@ void DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreatePrevPointSql(std::string& pr
 		std::string("' FROM ") + tableName + std::string(" WHERE ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_TAG_INDEX) + std::string(" = ") +
 		std::to_string(tagId) + std::string(" AND ") +
 		date + std::string(" >= DATEADD(day, ") + std::string("-") + m_attributes.daysBack + std::string(", '") + startDate + std::string("') AND ") +
-		date + std::string(" < '") + startDate + std::string("' ORDER BY ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_DATE_TIME) + std::string(" DESC");
+		date + std::string(" < '") + startDate + std::string("'"); 
+	if (conditions.empty() && sql.size() > 1) {
+		prev = prev + std::string(" ") + sql ;
+	}
+	prev = prev + std::string(" ORDER BY ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_DATE_TIME) + std::string(" DESC");
 	
 	if (!conditions.empty()) {
 		std::string prevQueries;
@@ -483,7 +499,7 @@ void DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreatePrevPointConditionalSql(std:
 }
 
 
-void DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreatePostPointSql(std::string& post, const std::string& tableName, short tagId, const std::string& endDate, const std::vector <std::pair<std::string, std::string> >& conditions, const std::map<std::string, TagItemRecord>& tags)
+void DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreatePostPointSql(std::string& post, const std::string& tableName, short tagId, const std::string& endDate, const std::string& sql, const std::vector <std::pair<std::string, std::string> >& conditions, const std::map<std::string, TagItemRecord>& tags)
 {
 	//std::string date = std::string("DATEADD(millisecond,") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_MILLITM) + std::string(",") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_DATE_TIME) + std::string(")");
 	std::string date = tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_DATE_TIME);
@@ -492,8 +508,11 @@ void DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreatePostPointSql(std::string& po
 		tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_MILLITM) + std::string(" AS '") + std::string(TAG_TABLE_COLUMN_MILLITM) +
 		std::string("' FROM ") + tableName + std::string(" WHERE ") +
 		tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_TAG_INDEX) + std::string(" = ") +
-		std::to_string(tagId) + std::string(" AND ") + date + std::string(" >= '") + endDate +
-		std::string("' ORDER BY ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_DATE_TIME) + std::string(" ASC");
+		std::to_string(tagId) + std::string(" AND ") + date + std::string(" >= '") + endDate + std::string("'");
+	if (conditions.empty() && sql.size() > 1) {
+		post = post + std::string(" ")+ sql;
+	}
+	post = post + std::string(" ORDER BY ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_DATE_TIME) + std::string(" ASC");
 	if (!conditions.empty()) {
 		std::string postQueries;
 		for (std::vector <std::pair<std::string, std::string> >::const_iterator itr = conditions.cbegin(); itr != conditions.cend(); ++itr) {
@@ -563,8 +582,9 @@ std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementList(ParamVa
 	std::string startDatePrev;
 	std::string endDate;
 	std::vector <std::pair<std::string, std::string> > conditions;
+	std::string sql = param.GetSqc();
 	if (param.HasSql()) {
-		conditions = GetConditionsFromParam(param.GetSqc());
+		conditions = GetConditionsFromParam(sql);
 	}
 	CreateDateTimeString(startTime, endTime, tableName, date, startDate, startDatePrev, endDate);
 	date = tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_DATE_TIME);
@@ -574,16 +594,18 @@ std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementList(ParamVa
 		std::string("' FROM ") + tableName + std::string(" WHERE ") + tableName +
 		std::string(".") + std::string(TAG_TABLE_COLUMN_TAG_INDEX) + std::string(" = ") + std::to_string(tagItr->second.GetTagId()) + std::string(" AND ") +
 		date + std::string(" > '") + startDate + std::string("' AND ") + date + std::string(" < '") + endDate + std::string("'");
-
+	if (conditions.empty() && sql.size() > 0) {
+		query = query + std::string(" ") + sql;
+	}
 	std::string prev;
 	if (param.HasPrevPoint()) {
-		CreatePrevPointSql(prev, tableName, tagItr->second.GetTagId(), startDate, conditions, tags);
+		CreatePrevPointSql(prev, tableName, tagItr->second.GetTagId(), startDate, sql, conditions, tags);
 	}
 
 	std::string post; 
-	if (param.HasPostPoint()) {
-		CreatePostPointSql(post, tableName, tagItr->second.GetTagId(), endDate, conditions, tags);
-	}
+	//if (param.HasPostPoint()) {
+		CreatePostPointSql(post, tableName, tagItr->second.GetTagId(), endDate, sql, conditions, tags);
+	//}
 
 	if (!conditions.empty()) {
 		std::string queries;
