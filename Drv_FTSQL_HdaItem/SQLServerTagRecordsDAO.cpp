@@ -181,7 +181,8 @@ std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementConditionVal
 		std::string("' , ") + date + std::string(" AS '") + std::string(TAG_TABLE_COLUMN_DATE_TIME) + std::string("' , ") +
 		tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_MILLITM) + std::string(" AS '") + std::string(TAG_TABLE_COLUMN_MILLITM) +
 		std::string("' FROM ") + tableName + std::string(" WHERE ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_TAG_INDEX) + std::string(" = ") +
-		std::to_string(tagItr->second.GetTagId()) + std::string(" AND ") + date + std::string(" > '") + startDate + std::string("' AND ") + date + std::string(" < '") + endDate + std::string("'");
+		std::to_string(tagItr->second.GetTagId()) + std::string(" AND ") + date + std::string(" > '") + startDate + std::string("' AND ") + date + std::string(" < '") + endDate + 
+		std::string("' AND ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_TAG_STATUS) + std::string(" = ''");
 
 	std::string prev;
 	if (param.HasPrevPoint()) {
@@ -438,7 +439,7 @@ void DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreatePrevPointSql(std::string& pr
 		std::string("' FROM ") + tableName + std::string(" WHERE ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_TAG_INDEX) + std::string(" = ") +
 		std::to_string(tagId) + std::string(" AND ") +
 		date + std::string(" >= DATEADD(day, ") + std::string("-") + m_attributes.daysBack + std::string(", '") + startDate + std::string("') AND ") +
-		date + std::string(" < '") + startDate + std::string("'"); 
+		date + std::string(" < '") + startDate + std::string("' AND ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_TAG_STATUS) + std::string(" = ''");
 	if (conditions.empty() && sql.size() > 1) {
 		prev = prev + std::string(" ") + sql ;
 	}
@@ -479,7 +480,8 @@ void DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreatePrevPointConditionalSql(std:
 		std::string("' FROM ") + tableName + std::string(" WHERE ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_TAG_INDEX) + std::string(" = ") +
 		std::to_string(tagId) + std::string(" AND ") +
 		date + std::string(" >= DATEADD(day, ") + std::string("-") + m_attributes.daysBack + std::string(", '") + startDate + std::string("') AND ") +
-		date + std::string(" < '") + startDate + std::string("' ORDER BY ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_DATE_TIME) + std::string(" DESC");
+		date + std::string(" < '") + startDate + std::string("' AND ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_TAG_STATUS) + std::string(" = ''") +
+		std::string(" ORDER BY ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_DATE_TIME) + std::string(" DESC");
 	
 	if (!conditions.empty()) {
 		std::string prevQueries;
@@ -508,7 +510,7 @@ void DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreatePostPointSql(std::string& po
 		tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_MILLITM) + std::string(" AS '") + std::string(TAG_TABLE_COLUMN_MILLITM) +
 		std::string("' FROM ") + tableName + std::string(" WHERE ") +
 		tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_TAG_INDEX) + std::string(" = ") +
-		std::to_string(tagId) + std::string(" AND ") + date + std::string(" >= '") + endDate + std::string("'");
+		std::to_string(tagId) + std::string(" AND ") + date + std::string(" >= '") + endDate + std::string("' AND ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_TAG_STATUS) + std::string(" = ''");
 	if (conditions.empty() && sql.size() > 1) {
 		post = post + std::string(" ")+ sql;
 	}
@@ -545,8 +547,9 @@ void DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreatePostPointConditionalSql(std:
 		std::string("' , ") + date + std::string(" AS '") + std::string(TAG_TABLE_COLUMN_DATE_TIME) + std::string("' , ") +
 		tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_MILLITM) + std::string(" AS '") + std::string(TAG_TABLE_COLUMN_MILLITM) +
 		std::string("' FROM ") + tableName + std::string(" WHERE ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_TAG_INDEX) + std::string(" = ") +
-		std::to_string(tagId) + std::string(" AND ") + date + std::string(" >= '") + endDate +
-		std::string("' ORDER BY ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_DATE_TIME) + std::string(" ASC");
+		std::to_string(tagId) + std::string(" AND ") + date + std::string(" >= '") + endDate + std::string("' AND ") + tableName +
+		std::string(".") + std::string(TAG_TABLE_COLUMN_TAG_STATUS) + std::string(" = ''") + 
+		std::string(" ORDER BY ") + tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_DATE_TIME) + std::string(" ASC");
 	
 	
 	if (!conditions.empty()) {
@@ -593,7 +596,8 @@ std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementList(ParamVa
 		tableName + std::string(".") + std::string(TAG_TABLE_COLUMN_MILLITM) + std::string(" AS '") + std::string(TAG_TABLE_COLUMN_MILLITM) +
 		std::string("' FROM ") + tableName + std::string(" WHERE ") + tableName +
 		std::string(".") + std::string(TAG_TABLE_COLUMN_TAG_INDEX) + std::string(" = ") + std::to_string(tagItr->second.GetTagId()) + std::string(" AND ") +
-		date + std::string(" > '") + startDate + std::string("' AND ") + date + std::string(" < '") + endDate + std::string("'");
+		date + std::string(" > '") + startDate + std::string("' AND ") + date + std::string(" < '") + endDate + std::string("' AND ") + tableName + 
+		std::string(".") + std::string(TAG_TABLE_COLUMN_TAG_STATUS) + std::string(" = ''");
 	if (conditions.empty() && sql.size() > 0) {
 		query = query + std::string(" ") + sql;
 	}
@@ -603,9 +607,9 @@ std::string DrvFTSQLHdaItem::SQLServerTagRecordsDAO::CreateStatementList(ParamVa
 	}
 
 	std::string post; 
-	//if (param.HasPostPoint()) {
+	if (param.HasPostPoint()) {
 		CreatePostPointSql(post, tableName, tagItr->second.GetTagId(), endDate, sql, conditions, tags);
-	//}
+	}
 
 	if (!conditions.empty()) {
 		std::string queries;

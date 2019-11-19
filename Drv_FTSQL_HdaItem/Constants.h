@@ -15,6 +15,7 @@ static const char* TAG_FLOAT_VALUE_TABLE_NAME = "FloatTable";
 static const char* TAG_STRING_VALUE_TABLE_NAME = "StringTable";
 static const char* TAG_TABLE_COLUMN_DATE_TIME = "DateAndTime";
 static const char* TAG_TABLE_COLUMN_MILLITM = "Millitm";
+static const char* TAG_TABLE_COLUMN_TAG_STATUS = "Status";
 static const char* TAG_TABLE_COLUMN_CONDITION_DATE_TIME = "ConditionDateTime";
 static const char* TAG_TABLE_COLUMN_CONDITION_MILLISEC = "ConditionMillitm";
 static const char* TAG_TABLE_COLUMN_VALUE = "Val";
