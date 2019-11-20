@@ -480,20 +480,24 @@ void DrvFTSQLHdaItem::HdaCommandHandler::ExecuteQueriesList(const std::map<int, 
 					std::vector<ODS::TvqListElementDescription> listDesc;
 					for (std::vector<Record>::const_iterator itr = vec.cbegin(); itr != vec.cend(); ++itr) {
 						ODS::Tvq* tvq = CreateTvqFromRecord(*itr, nullptr);
-						if (itr == vec.cbegin()) {
-							if (ODS::TimeUtils::SysTimeCompare(tvq->GetTimestampLoc(), localStartDataTime) < 0) {
-								ODS::TvqListElementDescription desc;
-								desc.m_nIndex = 0;
-								desc.m_ulFlags = ODS::TvqListElementDescription::PREV_POINT;
-								listDesc.push_back(desc);
+						SYSTEMTIME tm = tvq->GetTimestampLoc();
+						if (tm.wYear != 0) {
+							if (itr == vec.cbegin()) {
+
+								if (ODS::TimeUtils::SysTimeCompare(tvq->GetTimestampLoc(), localStartDataTime) < 0) {
+									ODS::TvqListElementDescription desc;
+									desc.m_nIndex = 0;
+									desc.m_ulFlags = ODS::TvqListElementDescription::PREV_POINT;
+									listDesc.push_back(desc);
+								}
 							}
-						}
-						if (itr == vec.cend() - 1) {
-							if (ODS::TimeUtils::SysTimeCompare(tvq->GetTimestampLoc(), localEndDataTime) > 0) {
-								ODS::TvqListElementDescription desc;
-								desc.m_nIndex = vec.size() - 1;
-								desc.m_ulFlags = ODS::TvqListElementDescription::POST_POINT;
-								listDesc.push_back(desc);
+							if (itr == vec.cend() - 1) {
+								if (ODS::TimeUtils::SysTimeCompare(tvq->GetTimestampLoc(), localEndDataTime) > 0) {
+									ODS::TvqListElementDescription desc;
+									desc.m_nIndex = vec.size() - 1;
+									desc.m_ulFlags = ODS::TvqListElementDescription::POST_POINT;
+									listDesc.push_back(desc);
+								}
 							}
 						}
 						pFuncResult->AddTvq(tvq);
@@ -633,7 +637,9 @@ ODS::Tvq* DrvFTSQLHdaItem::HdaCommandHandler::CreateTvqFromRecord(const Record& 
 	dataTime.wMilliseconds = millisec;
 	//ODS::OdbcLib::ConvertTimestampStructToSysTime(dataTime, &utcDataTime);
 	ODS::TimeUtils::SysTimeUtcToLocal(dataTime, &localDataTime);
-	tvq->SetTimestamp(&localDataTime);
+	if (localDataTime.wYear != 0) {
+		tvq->SetTimestamp(&localDataTime);
+	}
 	tvq->SetQuality(ODS::Tvq::QUALITY_GOOD);
 	return tvq;
 	
